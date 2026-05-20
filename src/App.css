@@ -1,0 +1,28 @@
+/* Responsive styles for LendSwift Multi-Step Form */
+
+.main-responsive {
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+  .main-responsive {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+    padding: 1rem !important;
+  }
+
+  .sidebar-responsive {
+    display: none !important; /* Hide sidebar list on mobile, use simple status/percentage */
+  }
+
+  .form-card-responsive {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .modal-content {
+    padding: 1.5rem !important;
+    max-width: 95% !important;
+  }
+}
