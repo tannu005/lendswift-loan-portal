@@ -421,3 +421,25 @@ body {
     font-size: 16px; /* Prevents zoom on iOS */
   }
 }
+
+/* Custom interactive overrides */
+@media (pointer: fine) {
+  body, button, a, input, select, textarea, .radio-card, .file-upload-box, [role="button"] {
+    cursor: none !important;
+  }
+}
+
+#three-bg-canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -10;
+  pointer-events: none;
+}
+
+.tilt-card {
+  transform-style: preserve-3d;
+  transition: transform 0.25s cubic-bezier(0.25, 1, 0.5, 1);
+}

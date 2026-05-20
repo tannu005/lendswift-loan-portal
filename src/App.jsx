@@ -9,6 +9,8 @@ import Step5Employment from './components/steps/Step5Employment';
 import Step6CoApplicant from './components/steps/Step6CoApplicant';
 import Step7Documents from './components/steps/Step7Documents';
 import Step8Review from './components/steps/Step8Review';
+import ThreeBackground from './components/ThreeBackground';
+import CustomCursor from './components/CustomCursor';
 import './App.css';
 
 const STEP_NAMES = {
@@ -280,7 +282,7 @@ function WizardContainer() {
             <div style={{ display: 'flex', gap: '0.75rem', justifyContent: 'flex-end' }}>
               <button
                 type="button"
-                className="btn btn-secondary"
+                className="btn btn-secondary magnetic-btn"
                 onClick={clearDraft}
                 id="resume-modal-fresh"
               >
@@ -288,7 +290,7 @@ function WizardContainer() {
               </button>
               <button
                 type="button"
-                className="btn btn-primary"
+                className="btn btn-primary magnetic-btn"
                 onClick={restore}
                 id="resume-modal-resume"
               >
@@ -317,6 +319,8 @@ function WizardContainer() {
 export default function App() {
   return (
     <FormProvider>
+      <ThreeBackground />
+      <CustomCursor />
       <WizardContainer />
     </FormProvider>
   );
