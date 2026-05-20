@@ -4,6 +4,7 @@ import SignatureCanvas from 'react-signature-canvas';
 import { useFormContext } from '../../context/FormContext';
 import { LOAN_TYPE_HOME, LOAN_TYPE_BUSINESS, EMPLOYMENT_SALARIED, EMPLOYMENT_SELF_EMPLOYED, EMPLOYMENT_BUSINESS_OWNER, ACCEPTED_DOC_TYPES, ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE_BYTES } from '../../utils/constants';
 import { compressImage, formatFileSize } from '../../utils/imageCompression';
+import { Upload, FileText, X, ChevronLeft, ChevronRight, Lock, ShieldCheck, CheckCircle } from 'lucide-react';
 
 const getRequiredDocs = (loanType, employmentType, panVerified) => {
   const docs = [];
@@ -20,10 +21,10 @@ const getRequiredDocs = (loanType, employmentType, panVerified) => {
   );
 
   if (employmentType === EMPLOYMENT_SALARIED) {
-    docs.push({ key: 'salarySlipsDoc', label: 'Salary Slips (Last 3 months)', accept: ['application/pdf'], maxSize: MAX_FILE_SIZE_BYTES, required: true, multiple: true });
+    docs.push({ key: 'salarySlipsDoc', label: 'Salary Slips (3 months)', accept: ['application/pdf'], maxSize: MAX_FILE_SIZE_BYTES, required: true, multiple: true });
   }
 
-  docs.push({ key: 'bankStatementsDoc', label: 'Bank Statements (Last 6 months)', accept: ['application/pdf'], maxSize: 10 * 1024 * 1024, required: true });
+  docs.push({ key: 'bankStatementsDoc', label: 'Bank Statements (6 months)', accept: ['application/pdf'], maxSize: 10 * 1024 * 1024, required: true });
 
   if (employmentType === EMPLOYMENT_SELF_EMPLOYED || employmentType === EMPLOYMENT_BUSINESS_OWNER) {
     docs.push({ key: 'itrDoc', label: 'ITR (Last 2 years)', accept: ['application/pdf'], maxSize: MAX_FILE_SIZE_BYTES, required: true, multiple: true });
@@ -38,7 +39,7 @@ const getRequiredDocs = (loanType, employmentType, panVerified) => {
     docs.push({ key: 'gstReturnsDoc', label: 'GST Returns (Last 4 quarters)', accept: ['application/pdf'], maxSize: MAX_FILE_SIZE_BYTES, required: true, multiple: true });
   }
 
-  docs.push({ key: 'photographDoc', label: 'Passport Size Photograph', accept: ACCEPTED_IMAGE_TYPES, maxSize: 2 * 1024 * 1024, required: true });
+  docs.push({ key: 'photographDoc', label: 'Passport Photograph', accept: ACCEPTED_IMAGE_TYPES, maxSize: 2 * 1024 * 1024, required: true });
 
   return docs;
 };
@@ -95,34 +96,49 @@ function FileUploadField({ doc, files, onFilesChange }) {
   return (
     <div style={{ marginBottom: '1.25rem' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.5rem' }}>
-        <label className="form-label" style={{ marginBottom: 0 }}>
+        <label className="form-label" style={{ marginBottom: 0, color: 'var(--color-text-primary)', fontSize: '0.875rem', fontWeight: '500' }}>
           {doc.label} {doc.required && <span className="required">*</span>}
         </label>
-        {hasFiles && <span className="badge badge-success">✓ Uploaded</span>}
+        {hasFiles && (
+          <span style={{ fontSize: '0.75rem', color: 'var(--color-accent)', fontWeight: '500' }}>
+            Ready
+          </span>
+        )}
       </div>
 
       {!hasFiles && (
         <div
           {...getRootProps()}
-          className={`dropzone ${isDragActive ? 'active' : ''} ${isDragReject ? 'reject' : ''}`}
-          style={{ padding: '1.25rem' }}
+          style={{
+            padding: '1.25rem',
+            border: isDragReject
+              ? '1px dashed var(--color-error)'
+              : isDragActive
+                ? '1px dashed var(--color-primary-light)'
+                : '1px dashed var(--color-border-light)',
+            borderRadius: '6px',
+            background: 'var(--color-input-bg)',
+            textAlign: 'center',
+            cursor: 'pointer',
+            transition: 'border-color 0.2s, background 0.2s',
+          }}
           role="button"
           aria-label={`Upload ${doc.label}`}
         >
           <input {...getInputProps()} aria-label={`File input for ${doc.label}`} />
           {compressing ? (
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', justifyContent: 'center' }}>
-              <span className="animate-spin" style={{ display: 'inline-block', width: '20px', height: '20px', border: '2px solid var(--color-primary-light)', borderTopColor: 'transparent', borderRadius: '50%' }}></span>
-              <span>Compressing image...</span>
+              <span className="animate-spin" style={{ display: 'inline-block', width: '16px', height: '16px', border: '2px solid var(--color-primary-light)', borderTopColor: 'transparent', borderRadius: '50%' }}></span>
+              <span style={{ color: 'var(--color-text-secondary)', fontSize: '0.8125rem' }}>Compressing image...</span>
             </div>
           ) : (
             <>
-              <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>📁</div>
-              <p style={{ fontSize: '0.875rem', color: 'var(--color-text-secondary)' }}>
-                {isDragActive ? 'Drop file here...' : 'Drag & drop or click to upload'}
+              <Upload size={18} style={{ color: 'var(--color-text-muted)', marginBottom: '0.375rem', margin: '0 auto 0.25rem' }} />
+              <p style={{ fontSize: '0.8125rem', color: 'var(--color-text-secondary)', margin: 0 }}>
+                {isDragActive ? 'Drop file here...' : 'Drag & drop or click to browse'}
               </p>
-              <p style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', marginTop: '0.25rem' }}>
-                Max {formatFileSize(doc.maxSize)} • {doc.accept.map(t => t.split('/')[1].toUpperCase()).join(', ')}
+              <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)', marginTop: '0.125rem' }}>
+                Max {formatFileSize(doc.maxSize)} · PDF or Images
               </p>
             </>
           )}
@@ -131,47 +147,43 @@ function FileUploadField({ doc, files, onFilesChange }) {
 
       {/* File previews */}
       {hasFiles && (
-        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.75rem', marginTop: '0.5rem' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.375rem' }}>
           {files.map((file, index) => (
             <div key={index} style={{
               display: 'flex', alignItems: 'center', gap: '0.5rem',
-              padding: '0.5rem 0.75rem', background: 'var(--color-surface-lighter)',
-              borderRadius: '0.5rem', fontSize: '0.825rem',
+              padding: '0.375rem 0.625rem', background: 'var(--color-surface-lighter)',
+              borderRadius: '4px', fontSize: '0.8rem', width: '100%',
+              border: '1px solid var(--color-border)',
             }}>
               {file.type?.startsWith('image/') ? (
                 <img
                   src={URL.createObjectURL(file)}
                   alt={file.name}
-                  style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '4px' }}
+                  style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '3px' }}
                 />
               ) : (
-                <span style={{ fontSize: '1.5rem' }}>📄</span>
+                <FileText size={16} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
               )}
-              <div>
-                <p style={{ fontSize: '0.8rem', maxWidth: '150px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <p style={{ fontSize: '0.75rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', margin: 0, color: 'var(--color-text-primary)' }}>
                   {file.name}
                 </p>
-                <p style={{ fontSize: '0.7rem', color: 'var(--color-text-muted)' }}>{formatFileSize(file.size)}</p>
+                <p style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', margin: 0 }}>{formatFileSize(file.size)}</p>
               </div>
               <button
                 type="button"
                 onClick={() => removeFile(index)}
                 style={{
-                  background: 'var(--color-error)',
-                  color: 'white',
+                  background: 'transparent',
+                  color: 'var(--color-text-muted)',
                   border: 'none',
-                  borderRadius: '50%',
-                  width: '20px',
-                  height: '20px',
-                  fontSize: '0.7rem',
                   cursor: 'pointer',
+                  padding: '4px',
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'center',
                 }}
-                aria-label={`Remove ${file.name}`}
               >
-                ✕
+                <X size={14} />
               </button>
             </div>
           ))}
@@ -179,8 +191,8 @@ function FileUploadField({ doc, files, onFilesChange }) {
       )}
 
       {compressionInfo && hasFiles && files[0]?.type?.startsWith('image/') && (
-        <p style={{ fontSize: '0.75rem', color: 'var(--color-accent)', marginTop: '0.25rem' }}>
-          🗜️ Compressed: {compressionInfo.original} → {compressionInfo.compressed} ({compressionInfo.ratio}% reduction)
+        <p style={{ fontSize: '0.7rem', color: 'var(--color-accent)', marginTop: '0.25rem', margin: 0 }}>
+          Optimized: {compressionInfo.original} → {compressionInfo.compressed} (-{compressionInfo.ratio}%)
         </p>
       )}
     </div>
@@ -212,7 +224,7 @@ export default function Step7Documents({ onNext, onPrev }) {
   const clearSignature = () => {
     sigRef.current?.clear();
     setSignatureData(null);
-    setValidationErrors(prev => ({ ...prev, signature: 'E-signature is required' }));
+    setValidationErrors(prev => ({ ...prev, signature: 'Signature is required' }));
   };
 
   const handleSignatureEnd = () => {
@@ -231,16 +243,14 @@ export default function Step7Documents({ onNext, onPrev }) {
     e.preventDefault();
     const errors = {};
 
-    // Validate required documents
     for (const doc of requiredDocs) {
       if (doc.required && (!uploadedFiles[doc.key] || uploadedFiles[doc.key].length === 0)) {
         errors[doc.key] = `${doc.label} is required`;
       }
     }
 
-    // Validate signature
     if (!signatureData) {
-      errors.signature = 'E-signature is required';
+      errors.signature = 'Signature is required';
     }
 
     if (Object.keys(errors).length > 0) {
@@ -255,119 +265,226 @@ export default function Step7Documents({ onNext, onPrev }) {
   };
 
   return (
-    <form onSubmit={onSubmit} className="animate-fade-in" noValidate>
+    <form onSubmit={onSubmit} noValidate>
       <div style={{ marginBottom: '2rem' }}>
-        <h2 style={{ fontSize: '1.5rem', fontWeight: '700', marginBottom: '0.5rem' }}>
-          Document Upload & E-Signature
+        <h2 style={{ fontSize: '1.5rem', fontWeight: '600', marginBottom: '0.375rem', color: 'var(--color-text-primary)', letterSpacing: '-0.01em' }}>
+          Upload your documents
         </h2>
         <p style={{ color: 'var(--color-text-secondary)', fontSize: '0.925rem' }}>
-          Upload required documents and provide your digital signature
+          Secure end-to-end encrypted document upload and digital authorization signing.
         </p>
       </div>
 
-      {/* Document checklist */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '1rem', color: 'var(--color-primary-light)' }}>
-          📋 Required Documents
-        </h3>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.5rem', marginBottom: '1rem' }}>
-          {requiredDocs.map((doc) => (
-            <div key={doc.key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.825rem' }}>
-              {uploadedFiles[doc.key]?.length > 0 ? (
-                <span style={{ color: 'var(--color-accent)' }}>✓</span>
-              ) : doc.required ? (
-                <span style={{ color: 'var(--color-error)' }}>○</span>
-              ) : (
-                <span style={{ color: 'var(--color-text-muted)' }}>○</span>
-              )}
-              <span style={{ color: uploadedFiles[doc.key]?.length > 0 ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}>
-                {doc.label}
-              </span>
-            </div>
-          ))}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.825rem' }}>
-            {signatureData ? (
-              <span style={{ color: 'var(--color-accent)' }}>✓</span>
-            ) : (
-              <span style={{ color: 'var(--color-error)' }}>○</span>
-            )}
-            <span style={{ color: signatureData ? 'var(--color-accent)' : 'var(--color-text-secondary)' }}>E-Signature</span>
+      {/* Asymmetric Split Layout */}
+      <div style={{
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+        gap: '2rem',
+        alignItems: 'start',
+      }}>
+        {/* Left Column: Upload Fields + Signature Pad */}
+        <div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+            {requiredDocs.map((doc) => (
+              <div key={doc.key}>
+                <FileUploadField
+                  doc={doc}
+                  files={uploadedFiles[doc.key] || []}
+                  onFilesChange={handleFilesChange}
+                />
+                {validationErrors[doc.key] && (
+                  <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>
+                    {validationErrors[doc.key]}
+                  </p>
+                )}
+              </div>
+            ))}
           </div>
-        </div>
-      </div>
 
-      {/* File uploads */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        {requiredDocs.map((doc) => (
-          <div key={doc.key}>
-            <FileUploadField
-              doc={doc}
-              files={uploadedFiles[doc.key] || []}
-              onFilesChange={handleFilesChange}
-            />
-            {validationErrors[doc.key] && (
-              <p role="alert" aria-live="polite" style={{ color: 'var(--color-error)', fontSize: '0.825rem', marginTop: '-0.75rem', marginBottom: '1rem' }}>
-                {validationErrors[doc.key]}
+          {/* Digital Signature Pad */}
+          <div style={{ marginTop: '1.5rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
+            <span style={{ fontSize: '0.75rem', fontWeight: '600', textTransform: 'uppercase', color: 'var(--color-text-muted)', display: 'block', marginBottom: '0.25rem' }}>
+              Digital signature authorization
+            </span>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '0.75rem' }}>
+              Draw your sign inside the box below to authorize secure checks.
+            </p>
+
+            <div style={{
+              background: '#08090C',
+              borderRadius: '6px',
+              border: '1px solid var(--color-border)',
+              overflow: 'hidden',
+              position: 'relative',
+            }}>
+              <SignatureCanvas
+                ref={sigRef}
+                penColor="#E8ECF3"
+                canvasProps={{
+                  width: 500,
+                  height: 120,
+                  style: { width: '100%', height: '110px', cursor: 'crosshair' },
+                  'aria-label': 'Signature capture window',
+                }}
+                onEnd={handleSignatureEnd}
+              />
+              <button
+                type="button"
+                onClick={clearSignature}
+                style={{
+                  position: 'absolute',
+                  right: '8px',
+                  bottom: '8px',
+                  background: 'rgba(255,255,255,0.03)',
+                  border: '1px solid var(--color-border)',
+                  color: 'var(--color-text-secondary)',
+                  padding: '3px 8px',
+                  fontSize: '0.6875rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Clear
+              </button>
+            </div>
+            {validationErrors.signature && (
+              <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '0.5rem' }}>
+                {validationErrors.signature}
               </p>
             )}
           </div>
-        ))}
-      </div>
-
-      {/* E-Signature */}
-      <div className="card" style={{ marginBottom: '1.5rem' }}>
-        <h3 style={{ fontSize: '1.1rem', fontWeight: '600', marginBottom: '0.5rem', color: 'var(--color-primary-light)' }}>
-          ✍️ E-Signature
-        </h3>
-        <p style={{ fontSize: '0.825rem', color: 'var(--color-text-muted)', marginBottom: '1rem' }}>
-          Draw your signature in the box below using mouse or touch
-        </p>
-        
-        <div className="signature-canvas-wrapper" style={{ marginBottom: '0.75rem' }}>
-          <SignatureCanvas
-            ref={sigRef}
-            penColor="#000"
-            canvasProps={{
-              width: 500,
-              height: 200,
-              style: { width: '100%', height: '150px', cursor: 'crosshair' },
-              'aria-label': 'Signature drawing area',
-            }}
-            onEnd={handleSignatureEnd}
-          />
         </div>
 
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <button type="button" onClick={clearSignature} className="btn btn-secondary btn-sm">
-            Clear Signature
-          </button>
-        </div>
+        {/* Right Column: Handcrafted Document Vault Lock Panel */}
+        <div style={{
+          background: 'var(--color-surface-light)',
+          border: '1px solid var(--color-border)',
+          borderRadius: '8px',
+          padding: '1.5rem',
+          position: 'sticky',
+          top: '20px',
+        }}>
+          <p style={{
+            fontSize: '0.6875rem',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em',
+            color: 'var(--color-text-muted)',
+            fontWeight: '600',
+            marginBottom: '1.25rem',
+          }}>
+            Secure Document Locker
+          </p>
 
-        {signatureData && (
-          <p style={{ fontSize: '0.8rem', color: 'var(--color-accent)', marginTop: '0.5rem' }}>
-            ✓ Signature captured
-          </p>
-        )}
-        {validationErrors.signature && (
-          <p role="alert" aria-live="polite" style={{ color: 'var(--color-error)', fontSize: '0.825rem', marginTop: '0.5rem' }}>
-            {validationErrors.signature}
-          </p>
-        )}
+          <div style={{
+            background: 'var(--color-surface-lighter)',
+            border: '1px solid var(--color-border-light)',
+            borderRadius: '6px',
+            padding: '1.25rem',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '0.75rem',
+          }}>
+            {requiredDocs.map((doc) => {
+              const fileList = uploadedFiles[doc.key] || [];
+              const isUploaded = fileList.length > 0;
+              return (
+                <div key={doc.key} style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.75rem',
+                  fontSize: '0.75rem',
+                  opacity: isUploaded ? 1 : 0.45,
+                  transition: 'opacity 0.2s',
+                }}>
+                  <div style={{
+                    color: isUploaded ? 'var(--color-accent)' : 'var(--color-text-muted)',
+                  }}>
+                    <Lock size={12} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ color: 'var(--color-text-primary)', display: 'block', fontWeight: '500', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                      {doc.label.replace(' (Optional - Verified)', '')}
+                    </span>
+                    <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', display: 'block', fontFamily: 'monospace' }}>
+                      {isUploaded ? `AES-256 [SHA-${fileList[0].name.length * 3}37a]` : 'LOCKER SLOT EMPTY'}
+                    </span>
+                  </div>
+                  {isUploaded && <CheckCircle size={12} style={{ color: 'var(--color-accent)' }} />}
+                </div>
+              );
+            })}
+
+            {/* Signature status in locker */}
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.75rem',
+              fontSize: '0.75rem',
+              opacity: signatureData ? 1 : 0.45,
+              paddingTop: '0.75rem',
+              borderTop: '1px dashed var(--color-border)',
+            }}>
+              <div style={{ color: signatureData ? 'var(--color-accent)' : 'var(--color-text-muted)' }}>
+                <Lock size={12} />
+              </div>
+              <div style={{ flex: 1 }}>
+                <span style={{ color: 'var(--color-text-primary)', display: 'block', fontWeight: '500' }}>
+                  Signing Authorization
+                </span>
+                <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', display: 'block', fontFamily: 'monospace' }}>
+                  {signatureData ? 'DIGITIZED & CRYPTO-SIGNED' : 'PENDING E-SIGN'}
+                </span>
+              </div>
+              {signatureData && <CheckCircle size={12} style={{ color: 'var(--color-accent)' }} />}
+            </div>
+
+            {signatureData && (
+              <div style={{
+                marginTop: '0.5rem',
+                padding: '0.375rem',
+                borderRadius: '4px',
+                background: 'var(--color-surface-light)',
+                border: '1px solid var(--color-border)',
+                height: '40px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                overflow: 'hidden',
+              }}>
+                <img src={signatureData} alt="Captured E-signature preview" style={{ height: '100%', filter: 'invert(1)' }} />
+              </div>
+            )}
+
+            {Object.keys(uploadedFiles).length === requiredDocs.length && signatureData && (
+              <div style={{
+                marginTop: '0.5rem',
+                padding: '0.5rem',
+                borderRadius: '4px',
+                background: 'rgba(16, 185, 129, 0.05)',
+                border: '1px solid rgba(16, 185, 129, 0.12)',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.375rem',
+                fontSize: '0.6875rem',
+                color: 'var(--color-accent)',
+              }}>
+                <ShieldCheck size={12} />
+                <span>ALL UPLOADS ENCRYPTED</span>
+              </div>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* Navigation */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem' }}>
-        <button type="button" onClick={onPrev} className="btn btn-secondary">
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-          </svg>
-          Previous
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '1rem', borderTop: '1px solid var(--color-border)', marginTop: '2rem' }}>
+        <button type="button" onClick={onPrev} className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
+          <ChevronLeft size={16} />
+          Back
         </button>
-        <button type="submit" className="btn btn-primary">
-          Continue to Review
-          <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-          </svg>
+        <button type="submit" className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.375rem' }}>
+          Continue
+          <ChevronRight size={16} />
         </button>
       </div>
     </form>

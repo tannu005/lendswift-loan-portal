@@ -5,7 +5,7 @@ import { LOAN_CONFIGS, LOAN_TYPE_HOME } from '../utils/constants';
 const FormContext = createContext(null);
 
 const initialState = {
-  currentStep: 1,
+  currentStep: 0,
   completedSteps: [],
   formData: {},
   panVerified: false,
