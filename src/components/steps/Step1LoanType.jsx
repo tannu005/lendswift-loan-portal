@@ -6,6 +6,7 @@ import { LOAN_CONFIGS, LOAN_TYPE_PERSONAL, LOAN_TYPE_HOME, LOAN_TYPE_BUSINESS } 
 import { formatIndianCurrency } from '../../utils/validators';
 import { useEffect, useState } from 'react';
 import { User, Home, Briefcase, ChevronRight, Info } from 'lucide-react';
+import DirectionAwareCard from '../DirectionAwareCard';
 
 const LOAN_ICONS = {
   [LOAN_TYPE_PERSONAL]: User,
@@ -125,8 +126,9 @@ export default function Step1LoanType({ onNext }) {
             const Icon = LOAN_ICONS[type.value];
             const isSelected = selectedLoanType === type.value;
             return (
-              <button
+              <DirectionAwareCard
                 key={type.value}
+                as="button"
                 type="button"
                 onClick={() => setValue('loanType', type.value, { shouldValidate: true })}
                 style={{
@@ -135,7 +137,7 @@ export default function Step1LoanType({ onNext }) {
                   gap: '1rem',
                   padding: '1rem',
                   borderRadius: '6px',
-                  background: isSelected ? 'rgba(99, 102, 241, 0.08)' : 'var(--color-surface-light)',
+                  background: isSelected ? 'rgba(251, 191, 36, 0.05)' : 'var(--color-input-bg)',
                   border: `1px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
                   textAlign: 'left',
                   cursor: 'pointer',
@@ -151,7 +153,7 @@ export default function Step1LoanType({ onNext }) {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  color: isSelected ? 'white' : 'var(--color-text-muted)',
+                  color: isSelected ? 'var(--color-primary-light)' : 'var(--color-text-muted)',
                   flexShrink: 0,
                   transition: 'background 0.2s, color 0.2s',
                 }}>
@@ -175,7 +177,7 @@ export default function Step1LoanType({ onNext }) {
                     {type.description}
                   </p>
                 </div>
-              </button>
+              </DirectionAwareCard>
             );
           })}
           

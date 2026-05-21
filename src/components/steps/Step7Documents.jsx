@@ -451,7 +451,7 @@ export default function Step7Documents({ onNext, onPrev }) {
                 justifyContent: 'center',
                 overflow: 'hidden',
               }}>
-                <img src={signatureData} alt="Captured E-signature preview" style={{ height: '100%', filter: 'invert(1)' }} />
+                <img src={signatureData} alt="Captured E-signature preview" style={{ height: '100%' }} />
               </div>
             )}
 

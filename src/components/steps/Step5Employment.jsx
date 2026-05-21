@@ -6,6 +6,7 @@ import { EMPLOYMENT_SALARIED, EMPLOYMENT_SELF_EMPLOYED, EMPLOYMENT_BUSINESS_OWNE
 import { useEffect } from 'react';
 import { Briefcase, Laptop, Building2, ChevronLeft, ChevronRight, HelpCircle, ShieldCheck } from 'lucide-react';
 import { formatIndianCurrency } from '../../utils/validators';
+import RotatingValueDial from '../RotatingValueDial';
 
 const employmentOptions = [
   { value: EMPLOYMENT_SALARIED, label: 'Salaried', Icon: Briefcase, desc: 'Regular payroll employee' },
@@ -30,6 +31,7 @@ export default function Step5Employment({ onNext, onPrev }) {
       businessType: state.formData.businessType || '',
       annualTurnover: state.formData.annualTurnover || '',
       yearsInBusiness: state.formData.yearsInBusiness || '',
+      annualBusinessIncome: state.formData.annualBusinessIncome || '',
       monthlyIncome: state.formData.monthlyIncome || '',
       gstNumber: state.formData.gstNumber || '',
       officeAddressLine1: state.formData.officeAddressLine1 || '',
@@ -41,7 +43,7 @@ export default function Step5Employment({ onNext, onPrev }) {
 
   const employmentType = watch('employmentType');
   const monthlySalary = watch('monthlyNetSalary');
-  const monthlyIncome = watch('monthlyIncome');
+  const annualBusinessIncome = watch('annualBusinessIncome');
 
   // Clear fields when employment type changes
   useEffect(() => {
@@ -51,6 +53,7 @@ export default function Step5Employment({ onNext, onPrev }) {
         setValue('businessType', '');
         setValue('annualTurnover', '');
         setValue('yearsInBusiness', '');
+        setValue('annualBusinessIncome', '');
         setValue('monthlyIncome', '');
         setValue('gstNumber', '');
         setValue('officeAddressLine1', '');
@@ -76,7 +79,7 @@ export default function Step5Employment({ onNext, onPrev }) {
 
   // Handcrafted visual limit calculation
   const getAffordabilityDetails = () => {
-    const rawIncome = isSalaried ? monthlySalary : monthlyIncome;
+    const rawIncome = isSalaried ? monthlySalary : (annualBusinessIncome / 12);
     const incomeNum = Number(rawIncome);
     if (!incomeNum || isNaN(incomeNum) || incomeNum <= 0) return null;
 
@@ -190,7 +193,14 @@ export default function Step5Employment({ onNext, onPrev }) {
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                 <div>
                   <label htmlFor="monthlyNetSalary" className="form-label">Net Salary (₹) <span className="required">*</span></label>
-                  <input id="monthlyNetSalary" type="number" className={`form-input ${errors.monthlyNetSalary ? 'error' : ''}`} placeholder="Take home pay" min="15000" {...register('monthlyNetSalary')} />
+                  <RotatingValueDial 
+                    value={watch('monthlyNetSalary') || 50000} 
+                    onChange={(val) => setValue('monthlyNetSalary', val, { shouldValidate: true })} 
+                    min={15000} 
+                    max={500000} 
+                    step={5000} 
+                  />
+                  <input type="hidden" {...register('monthlyNetSalary')} />
                   {errors.monthlyNetSalary && <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.monthlyNetSalary.message}</p>}
                 </div>
                 <div>
@@ -236,9 +246,16 @@ export default function Step5Employment({ onNext, onPrev }) {
 
               {employmentType === EMPLOYMENT_SELF_EMPLOYED && (
                 <div>
-                  <label htmlFor="monthlyIncome" className="form-label">Monthly Income (₹) <span className="required">*</span></label>
-                  <input id="monthlyIncome" type="number" className={`form-input ${errors.monthlyIncome ? 'error' : ''}`} placeholder="75000" {...register('monthlyIncome')} />
-                  {errors.monthlyIncome && <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.monthlyIncome.message}</p>}
+                  <label htmlFor="annualBusinessIncome" className="form-label">Annual Income (₹) <span className="required">*</span></label>
+                  <RotatingValueDial 
+                    value={watch('annualBusinessIncome') || 500000} 
+                    onChange={(val) => setValue('annualBusinessIncome', val, { shouldValidate: true })} 
+                    min={100000} 
+                    max={10000000} 
+                    step={50000} 
+                  />
+                  <input type="hidden" {...register('annualBusinessIncome')} />
+                  {errors.annualBusinessIncome && <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '0.25rem' }}>{errors.annualBusinessIncome.message}</p>}
                 </div>
               )}
 

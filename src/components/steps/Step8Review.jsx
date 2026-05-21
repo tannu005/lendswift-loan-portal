@@ -315,7 +315,7 @@ export default function Step8Review({ onPrev, onGoToStep }) {
                   display: 'flex',
                   alignItems: 'center',
                 }}>
-                  <img src={state.signature} alt="Digital Seal signature" style={{ height: '100%', filter: 'invert(1)' }} />
+                  <img src={state.signature} alt="Digital Seal signature" style={{ height: '100%' }} />
                 </div>
               </div>
             )}

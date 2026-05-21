@@ -3,8 +3,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useFormContext } from '../../context/FormContext';
 import { getStep2Schema } from '../../utils/schemas';
 import { GENDER_OPTIONS, MARITAL_STATUS_OPTIONS } from '../../utils/constants';
-import { ChevronLeft, ChevronRight, Fingerprint, ShieldAlert } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Fingerprint, ShieldAlert, Clock } from 'lucide-react';
 import { useEffect } from 'react';
+import IosTimePicker from '../IosTimePicker';
 
 export default function Step2PersonalInfo({ onNext, onPrev }) {
   const { state, updateFormData } = useFormContext();
@@ -118,12 +119,27 @@ export default function Step2PersonalInfo({ onNext, onPrev }) {
             <div style={{ marginBottom: '1.25rem' }}>
               <label className="form-label">Gender <span className="required" aria-hidden="true">*</span></label>
               <div style={{ display: 'flex', gap: '0.375rem' }}>
-                {GENDER_OPTIONS.map((opt) => (
-                  <label key={opt.value} className="radio-card" style={{ padding: '0.5rem 0.75rem', flex: '1', borderRadius: '6px', textAlign: 'center', justifyContent: 'center' }}>
-                    <input type="radio" value={opt.value} {...register('gender')} style={{ display: 'none' }} />
-                    <span style={{ fontSize: '0.75rem', fontWeight: gender === opt.value ? '600' : '400' }}>{opt.label}</span>
-                  </label>
-                ))}
+                {GENDER_OPTIONS.map((opt) => {
+                  const isSelected = gender === opt.value;
+                  return (
+                    <label key={opt.value} style={{ 
+                      padding: '0.5rem 0.75rem', 
+                      flex: '1', 
+                      borderRadius: '6px', 
+                      textAlign: 'center', 
+                      justifyContent: 'center',
+                      cursor: 'pointer',
+                      border: `1px solid ${isSelected ? 'var(--color-primary)' : 'var(--color-border)'}`,
+                      background: isSelected ? 'rgba(59, 130, 246, 0.1)' : 'var(--color-input-bg)',
+                      transition: 'all 0.2s ease',
+                      display: 'flex',
+                      alignItems: 'center'
+                    }}>
+                      <input type="radio" value={opt.value} {...register('gender')} style={{ display: 'none' }} />
+                      <span style={{ fontSize: '0.75rem', fontWeight: isSelected ? '600' : '400', color: isSelected ? 'var(--color-text-primary)' : 'var(--color-text-secondary)' }}>{opt.label}</span>
+                    </label>
+                  );
+                })}
               </div>
               {errors.gender && (
                 <p role="alert" style={{ color: 'var(--color-error)', fontSize: '0.8rem', marginTop: '0.25rem' }}>
@@ -179,6 +195,26 @@ export default function Step2PersonalInfo({ onNext, onPrev }) {
           }}>
             {renderField('mobileNumber', 'Mobile Number', 'tel', 'mobileNumber', '10-digit mobile', true, { autoComplete: 'tel' })}
             {renderField('alternateMobile', 'Alternate Mobile', 'tel', 'alternateMobile', '10-digit mobile', false)}
+          </div>
+
+          <div style={{
+            paddingTop: '0.75rem',
+            borderTop: '1px solid var(--color-border)',
+            marginTop: '1.25rem'
+          }}>
+            <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <Clock size={14} /> Preferred Callback Time <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', fontWeight: 'normal' }}>(Optional)</span>
+            </label>
+            <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', marginBottom: '1rem' }}>
+              Select a time for our verification team to contact you.
+            </p>
+            <IosTimePicker 
+              value={watch('preferredCallbackTime') || '10:30 AM'} 
+              onChange={(val) => {
+                // If it isn't registered, we can manually update context or just register it here:
+                updateFormData({ preferredCallbackTime: val });
+              }} 
+            />
           </div>
         </div>
 
@@ -279,7 +315,7 @@ export default function Step2PersonalInfo({ onNext, onPrev }) {
               </div>
 
               <div>
-                <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase' }}>Contact Contact</span>
+                <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', display: 'block', textTransform: 'uppercase' }}>Mobile Number</span>
                 <span style={{ fontSize: '0.8125rem', color: mobileNumber ? 'var(--color-text-primary)' : 'rgba(255, 255, 255, 0.15)' }}>
                   {mobileNumber ? `+91 ${mobileNumber}` : '+91 XXXXX XXXXX'}
                 </span>

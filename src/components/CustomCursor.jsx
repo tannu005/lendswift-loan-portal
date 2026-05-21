@@ -1,119 +1,132 @@
 import { useEffect, useRef, useState } from 'react';
+import * as animejs from 'animejs';
+const anime = animejs.default || animejs;
 
-/**
- * Obsidian-inspired minimal custom cursor.
- * Shows a soft ring + dot on desktop only.
- * Expands gently over interactive elements.
- * Falls back to native cursor on mobile and reduced-motion.
- */
 export default function CustomCursor() {
-  const ringRef = useRef(null);
-  const dotRef = useRef(null);
-  const pos = useRef({ x: -100, y: -100 });
-  const target = useRef({ x: -100, y: -100 });
+  const containerRef = useRef(null);
+  const [isVisible, setIsVisible] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
-  const [visible, setVisible] = useState(false);
-  const rafRef = useRef(null);
-
+  
+  // Create an array of 8 particles for the blob
+  const particles = Array.from({ length: 8 });
+  
   useEffect(() => {
-    // Only show on desktop with fine pointer
-    const mq = window.matchMedia('(pointer: fine)');
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-    if (!mq.matches || prefersReducedMotion.matches) return;
-
-    setVisible(true);
-
     const onMouseMove = (e) => {
-      target.current = { x: e.clientX, y: e.clientY };
+      // Trigger anime.js to move all particles to the cursor position
+      // with a staggered delay to create the organic trailing blob effect
+      anime({
+        targets: '.cursor-particle',
+        translateX: e.clientX,
+        translateY: e.clientY,
+        duration: 800,
+        easing: 'easeOutElastic(1, .5)',
+        delay: anime.stagger(20) // Each particle is delayed by 20ms
+      });
     };
 
-    const onMouseEnter = () => setVisible(true);
-    const onMouseLeave = () => setVisible(false);
+    const onMouseEnter = () => setIsVisible(true);
+    const onMouseLeave = () => setIsVisible(false);
 
-    const interactiveSelector = 'button, a, label[for], [role="button"], .radio-card, .dropzone, .btn';
+    window.addEventListener('mousemove', onMouseMove);
+    document.body.addEventListener('mouseenter', onMouseEnter);
+    document.body.addEventListener('mouseleave', onMouseLeave);
 
-    const onPointerOver = (e) => {
-      if (e.target.closest(interactiveSelector)) {
-        setIsHovering(true);
+    const handleMouseOver = (e) => {
+      const target = e.target.closest('button, a, input[type="radio"], input[type="checkbox"], .card, .direction-aware, .sidebar-step-btn, .time-picker-item');
+      const isTextInput = e.target.closest('input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"], textarea, select');
+      
+      if (isTextInput) {
+         setIsHovering(false);
+         anime({
+           targets: '.cursor-particle',
+           scale: 0,
+           duration: 300,
+           easing: 'easeOutExpo'
+         });
+      } else if (target) {
+         setIsHovering(true);
+         // When hovering, particles scatter slightly and expand
+         anime({
+           targets: '.cursor-particle',
+           scale: (el, i, l) => 1.5 + (i * 0.1),
+           opacity: 0.8,
+           backgroundColor: '#fbbf24', // Amber glow
+           duration: 400,
+           easing: 'easeOutExpo',
+           // Introduce a slight random spread on hover
+           translateX: (el) => parseFloat(el.style.transform.split('(')[1]) + (Math.random() * 20 - 10),
+           translateY: (el) => parseFloat(el.style.transform.split(', ')[1]) + (Math.random() * 20 - 10),
+         });
+      } else {
+         setIsHovering(false);
+         // Return to normal cohesive blob
+         anime({
+           targets: '.cursor-particle',
+           scale: (el, i, l) => 1 - (i * 0.08), // Smaller as they go back
+           opacity: (el, i, l) => 1 - (i * 0.1),
+           backgroundColor: '#ffffff',
+           duration: 400,
+           easing: 'easeOutQuad'
+         });
       }
     };
-    const onPointerOut = (e) => {
-      if (e.target.closest(interactiveSelector)) {
-        setIsHovering(false);
-      }
-    };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseenter', onMouseEnter);
-    document.addEventListener('mouseleave', onMouseLeave);
-    document.addEventListener('pointerover', onPointerOver);
-    document.addEventListener('pointerout', onPointerOut);
-
-    // Smooth trailing animation
-    const animate = () => {
-      pos.current.x += (target.current.x - pos.current.x) * 0.15;
-      pos.current.y += (target.current.y - pos.current.y) * 0.15;
-
-      if (ringRef.current) {
-        ringRef.current.style.transform = `translate(${pos.current.x}px, ${pos.current.y}px) translate(-50%, -50%)`;
-      }
-      if (dotRef.current) {
-        dotRef.current.style.transform = `translate(${target.current.x}px, ${target.current.y}px) translate(-50%, -50%)`;
-      }
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-    rafRef.current = requestAnimationFrame(animate);
+    
+    document.addEventListener('mouseover', handleMouseOver);
 
     return () => {
-      document.removeEventListener('mousemove', onMouseMove);
-      document.removeEventListener('mouseenter', onMouseEnter);
-      document.removeEventListener('mouseleave', onMouseLeave);
-      document.removeEventListener('pointerover', onPointerOver);
-      document.removeEventListener('pointerout', onPointerOut);
-      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener('mousemove', onMouseMove);
+      document.body.removeEventListener('mouseenter', onMouseEnter);
+      document.body.removeEventListener('mouseleave', onMouseLeave);
+      document.removeEventListener('mouseover', handleMouseOver);
     };
   }, []);
 
-  if (!visible) return null;
-
   return (
-    <>
-      {/* Outer ring */}
-      <div
-        ref={ringRef}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: isHovering ? '40px' : '28px',
-          height: isHovering ? '40px' : '28px',
-          borderRadius: '50%',
-          border: `1px solid ${isHovering ? 'rgba(99, 102, 241, 0.5)' : 'rgba(255, 255, 255, 0.15)'}`,
-          pointerEvents: 'none',
-          zIndex: 99999,
-          transition: 'width 0.2s ease, height 0.2s ease, border-color 0.2s ease',
-          willChange: 'transform',
-          mixBlendMode: 'difference',
-        }}
-      />
-      {/* Center dot */}
-      <div
-        ref={dotRef}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '4px',
-          height: '4px',
-          borderRadius: '50%',
-          background: isHovering ? 'rgba(99, 102, 241, 0.8)' : 'rgba(255, 255, 255, 0.5)',
-          pointerEvents: 'none',
-          zIndex: 99999,
-          transition: 'background 0.15s ease',
-          willChange: 'transform',
-        }}
-      />
-    </>
+    <div 
+      ref={containerRef} 
+      style={{
+        position: 'fixed',
+        top: 0,
+        left: 0,
+        pointerEvents: 'none',
+        zIndex: 9999,
+        opacity: isVisible ? 1 : 0,
+        transition: 'opacity 0.3s ease',
+        // Optional: SVG gooey filter could be added here for even more organic blending
+      }}
+    >
+      {/* SVG Filter for Gooey Effect (optional but highly recommended for blobs) */}
+      <svg width="0" height="0" style={{ position: 'absolute' }}>
+        <filter id="goo">
+          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
+          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
+          <feBlend in="SourceGraphic" in2="goo" />
+        </filter>
+      </svg>
+
+      <div style={{ filter: 'url(#goo)' }}>
+        {particles.map((_, i) => (
+          <div
+            key={i}
+            className="cursor-particle"
+            style={{
+              position: 'absolute',
+              top: '-15px', // Center offset based on size
+              left: '-15px',
+              width: '30px',
+              height: '30px',
+              borderRadius: '50%',
+              backgroundColor: '#ffffff',
+              // Dynamic size reduction for trailing particles
+              transform: `scale(${1 - (i * 0.08)})`,
+              // Dynamic opacity
+              opacity: 1 - (i * 0.1),
+              mixBlendMode: 'screen',
+              willChange: 'transform'
+            }}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
