@@ -4,7 +4,7 @@ const anime = animejs.default || animejs;
 
 export default function CustomCursor() {
   const containerRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [isVisible, setIsVisible] = useState(true); // Default to true so it doesn't stay hidden if mouse is already in window
   const [isHovering, setIsHovering] = useState(false);
   
   // Create an array of 8 particles for the blob
@@ -64,7 +64,7 @@ export default function CustomCursor() {
            targets: '.cursor-particle',
            scale: (el, i, l) => 1 - (i * 0.08), // Smaller as they go back
            opacity: (el, i, l) => 1 - (i * 0.1),
-           backgroundColor: '#ffffff',
+           backgroundColor: '#fbbf24', // Use amber as base color for better visibility
            duration: 400,
            easing: 'easeOutQuad'
          });
@@ -116,7 +116,7 @@ export default function CustomCursor() {
               width: '30px',
               height: '30px',
               borderRadius: '50%',
-              backgroundColor: '#ffffff',
+              backgroundColor: '#fbbf24', // Amber base color
               // Dynamic size reduction for trailing particles
               transform: `scale(${1 - (i * 0.08)})`,
               // Dynamic opacity
