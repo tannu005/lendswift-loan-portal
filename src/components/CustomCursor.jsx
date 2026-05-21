@@ -1,72 +1,72 @@
-import { useEffect, useRef, useState } from 'react';
-import * as animejs from 'animejs';
-const anime = animejs.default || animejs;
+import { useEffect, useState } from 'react';
+import gsap from 'gsap';
 
 export default function CustomCursor() {
-  const containerRef = useRef(null);
-  const [isVisible, setIsVisible] = useState(true); // Default to true so it doesn't stay hidden if mouse is already in window
   const [isHovering, setIsHovering] = useState(false);
-  
-  // Create an array of 8 particles for the blob
-  const particles = Array.from({ length: 8 });
-  
+
   useEffect(() => {
+    const dot = document.querySelector('.cursor-dot');
+    const ring = document.querySelector('.cursor-ring');
+
+    if (!dot || !ring) return;
+
+    // Track mouse coordinates
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+    
+    // Track ring coordinates for spring physics
+    let ringX = mouseX;
+    let ringY = mouseY;
+
     const onMouseMove = (e) => {
-      // Trigger anime.js to move all particles to the cursor position
-      // with a staggered delay to create the organic trailing blob effect
-      anime({
-        targets: '.cursor-particle',
-        translateX: e.clientX,
-        translateY: e.clientY,
-        duration: 800,
-        easing: 'easeOutElastic(1, .5)',
-        delay: anime.stagger(20) // Each particle is delayed by 20ms
-      });
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      
+      // Move dot instantly
+      gsap.set(dot, { x: mouseX, y: mouseY });
     };
 
-    const onMouseEnter = () => setIsVisible(true);
-    const onMouseLeave = () => setIsVisible(false);
-
     window.addEventListener('mousemove', onMouseMove);
-    document.body.addEventListener('mouseenter', onMouseEnter);
-    document.body.addEventListener('mouseleave', onMouseLeave);
+
+    // Spring physics animation loop for the outer ring
+    const render = () => {
+      // Lerp (Linear Interpolation) for smooth delay
+      ringX += (mouseX - ringX) * 0.15;
+      ringY += (mouseY - ringY) * 0.15;
+      
+      gsap.set(ring, { x: ringX, y: ringY });
+      requestAnimationFrame(render);
+    };
+    
+    requestAnimationFrame(render);
 
     const handleMouseOver = (e) => {
-      const target = e.target.closest('button, a, input[type="radio"], input[type="checkbox"], .card, .direction-aware, .sidebar-step-btn, .time-picker-item');
+      const target = e.target.closest('button, a, input[type="radio"], input[type="checkbox"], .direction-aware, .sidebar-step-btn, .time-picker-item, label');
       const isTextInput = e.target.closest('input[type="text"], input[type="number"], input[type="email"], input[type="tel"], input[type="date"], textarea, select');
       
       if (isTextInput) {
          setIsHovering(false);
-         anime({
-           targets: '.cursor-particle',
-           scale: 0,
-           duration: 300,
-           easing: 'easeOutExpo'
-         });
+         gsap.to(dot, { scale: 0, opacity: 0, duration: 0.3 });
+         gsap.to(ring, { scale: 0.5, opacity: 0.2, duration: 0.3 });
       } else if (target) {
          setIsHovering(true);
-         // When hovering, particles scatter slightly and expand
-         anime({
-           targets: '.cursor-particle',
-           scale: (el, i, l) => 1.5 + (i * 0.1),
-           opacity: 0.8,
-           backgroundColor: '#fbbf24', // Amber glow
-           duration: 400,
-           easing: 'easeOutExpo',
-           // Introduce a slight random spread on hover
-           translateX: (el) => parseFloat(el.style.transform.split('(')[1]) + (Math.random() * 20 - 10),
-           translateY: (el) => parseFloat(el.style.transform.split(', ')[1]) + (Math.random() * 20 - 10),
+         // Hover state
+         gsap.to(dot, { scale: 0, opacity: 0, duration: 0.3 });
+         gsap.to(ring, { 
+           scale: 1.5, 
+           backgroundColor: 'rgba(251, 191, 36, 0.1)', 
+           borderColor: 'rgba(251, 191, 36, 0.8)',
+           duration: 0.3 
          });
       } else {
          setIsHovering(false);
-         // Return to normal cohesive blob
-         anime({
-           targets: '.cursor-particle',
-           scale: (el, i, l) => 1 - (i * 0.08), // Smaller as they go back
-           opacity: (el, i, l) => 1 - (i * 0.1),
-           backgroundColor: '#fbbf24', // Use amber as base color for better visibility
-           duration: 400,
-           easing: 'easeOutQuad'
+         // Normal state
+         gsap.to(dot, { scale: 1, opacity: 1, duration: 0.3 });
+         gsap.to(ring, { 
+           scale: 1, 
+           backgroundColor: 'transparent',
+           borderColor: 'rgba(251, 191, 36, 0.4)',
+           duration: 0.3 
          });
       }
     };
@@ -75,58 +75,46 @@ export default function CustomCursor() {
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
-      document.body.removeEventListener('mouseenter', onMouseEnter);
-      document.body.removeEventListener('mouseleave', onMouseLeave);
       document.removeEventListener('mouseover', handleMouseOver);
     };
   }, []);
 
   return (
-    <div 
-      ref={containerRef} 
-      style={{
-        position: 'fixed',
-        top: 0,
-        left: 0,
-        pointerEvents: 'none',
-        zIndex: 9999,
-        opacity: isVisible ? 1 : 0,
-        transition: 'opacity 0.3s ease',
-        // Optional: SVG gooey filter could be added here for even more organic blending
-      }}
-    >
-      {/* SVG Filter for Gooey Effect (optional but highly recommended for blobs) */}
-      <svg width="0" height="0" style={{ position: 'absolute' }}>
-        <filter id="goo">
-          <feGaussianBlur in="SourceGraphic" stdDeviation="4" result="blur" />
-          <feColorMatrix in="blur" mode="matrix" values="1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 18 -7" result="goo" />
-          <feBlend in="SourceGraphic" in2="goo" />
-        </filter>
-      </svg>
-
-      <div style={{ filter: 'url(#goo)' }}>
-        {particles.map((_, i) => (
-          <div
-            key={i}
-            className="cursor-particle"
-            style={{
-              position: 'absolute',
-              top: '-15px', // Center offset based on size
-              left: '-15px',
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              backgroundColor: '#fbbf24', // Amber base color
-              // Dynamic size reduction for trailing particles
-              transform: `scale(${1 - (i * 0.08)})`,
-              // Dynamic opacity
-              opacity: 1 - (i * 0.1),
-              mixBlendMode: 'screen',
-              willChange: 'transform'
-            }}
-          />
-        ))}
-      </div>
-    </div>
+    <>
+      {/* Inner Dot */}
+      <div 
+        className="cursor-dot"
+        style={{
+          position: 'fixed',
+          top: -4,
+          left: -4,
+          width: '8px',
+          height: '8px',
+          borderRadius: '50%',
+          backgroundColor: '#fbbf24', // Amber
+          pointerEvents: 'none',
+          zIndex: 9999,
+          willChange: 'transform'
+        }}
+      />
+      
+      {/* Outer Ring */}
+      <div 
+        className="cursor-ring"
+        style={{
+          position: 'fixed',
+          top: -16,
+          left: -16,
+          width: '32px',
+          height: '32px',
+          borderRadius: '50%',
+          border: '1px solid rgba(251, 191, 36, 0.4)',
+          pointerEvents: 'none',
+          zIndex: 9998,
+          willChange: 'transform, width, height, border-color, background-color',
+          transition: 'border-color 0.3s ease, background-color 0.3s ease'
+        }}
+      />
+    </>
   );
 }
