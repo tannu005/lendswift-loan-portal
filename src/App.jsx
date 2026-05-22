@@ -58,11 +58,12 @@ function WizardContainer() {
   // GSAP Transition Logic
   useEffect(() => {
     if (currentStep !== renderedStep && containerRef.current) {
-      animatePanelExit(containerRef.current, () => {
+      const direction = currentStep > renderedStep ? 1 : -1;
+      animatePanelExit(containerRef.current, direction, () => {
         setRenderedStep(currentStep);
         requestAnimationFrame(() => {
           if (containerRef.current) {
-            animatePanelEnter(containerRef.current);
+            animatePanelEnter(containerRef.current, direction);
           }
         });
       });
