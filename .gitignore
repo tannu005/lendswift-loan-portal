@@ -32,3 +32,9 @@ lint_output*.txt
 *.njsproj
 *.sln
 *.sw?
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
