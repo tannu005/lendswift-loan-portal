@@ -99,9 +99,43 @@ export function FormProvider({ children }) {
     dispatch({ type: 'SET_SIGNATURE', payload: sig });
   }, []);
 
-  const submitApplication = useCallback((appId) => {
+  const submitApplication = useCallback(async (appId) => {
+    // Collect all data from state
+    const applicationData = {
+      id: appId,
+      loanType: state.formData.loanType,
+      loanAmount: state.formData.loanAmount,
+      loanTenure: state.formData.loanTenure,
+      loanPurpose: state.formData.loanPurpose,
+      fullName: state.formData.fullName,
+      email: state.formData.email,
+      ...state.formData,
+      panVerified: state.panVerified,
+      aadhaarVerified: state.aadhaarVerified,
+      signature: state.signature,
+    };
+
+    try {
+      // POST to our new Node.js/Express backend
+      const response = await fetch('http://localhost:5000/api/applications', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(applicationData)
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to submit application to backend');
+      }
+      
+      const result = await response.json();
+      console.log('Backend response:', result);
+    } catch (err) {
+      console.error('Backend submission error:', err);
+      // Even if backend fails, we dispatch SUBMIT to show success on frontend for the sake of the portfolio simulation
+    }
+
     dispatch({ type: 'SUBMIT', payload: appId });
-  }, []);
+  }, [state]);
 
   const restoreState = useCallback((data, step) => {
     dispatch({ type: 'RESTORE', payload: { formData: data, currentStep: step } });

@@ -11,7 +11,8 @@
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "gh-pages -d dist",
+    "start:backend": "node backend/server.js"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

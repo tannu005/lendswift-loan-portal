@@ -14,10 +14,40 @@ export default function AdminDashboard({ onBack }) {
   const [role, setRole] = useState('underwriter'); // underwriter | admin
   const [isLoading, setIsLoading] = useState(true);
 
+  const [applications, setApplications] = useState([]);
+
   useEffect(() => {
-    // Simulate data loading
-    const t = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(t);
+    // Fetch data from backend
+    const fetchApplications = async () => {
+      try {
+        const response = await fetch('http://localhost:5000/api/applications');
+        if (response.ok) {
+          const data = await response.json();
+          // Transform backend data to match dashboard format
+          const formatted = data.map(app => ({
+            id: app.id.split('-')[0] + '-' + app.id.split('-')[1].slice(0, 4), // Shorten UUID
+            name: app.fullName || 'Unknown',
+            type: app.loanType.charAt(0).toUpperCase() + app.loanType.slice(1),
+            amount: app.loanAmount,
+            riskScore: Math.floor(Math.random() * (850 - 500) + 500), // Mock risk score for now
+            status: app.status === 'Pending' ? 'Review' : app.status,
+            date: new Date(app.createdAt).toLocaleDateString(),
+            fraudFlag: null
+          }));
+          setApplications(formatted);
+        } else {
+          console.warn('Backend fetch failed, using dummy data');
+          setApplications(DUMMY_APPLICATIONS);
+        }
+      } catch (err) {
+        console.warn('Could not connect to backend, using dummy data', err);
+        setApplications(DUMMY_APPLICATIONS);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchApplications();
   }, []);
 
   const getStatusColor = (status) => {
