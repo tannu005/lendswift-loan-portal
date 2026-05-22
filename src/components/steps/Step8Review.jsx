@@ -415,6 +415,16 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
                   type="text"
                   value={digit}
                   onChange={e => handleOtpChange(i, e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      if (otp.join('').length === 6) {
+                        processSubmission();
+                      }
+                    } else if (e.key === 'Backspace' && !digit && i > 0) {
+                      document.getElementById(`otp-${i - 1}`).focus();
+                    }
+                  }}
                   style={{ width: '40px', height: '48px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold', background: '#1e293b', border: `1px solid ${otpError ? '#ef4444' : '#334155'}`, borderRadius: '8px', color: '#fff', outline: 'none' }}
                   onFocus={e => e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#3b82f6'}
                   onBlur={e => e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#334155'}
