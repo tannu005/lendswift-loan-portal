@@ -45,6 +45,7 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
   const [consentErrors, setConsentErrors] = useState({});
   const [showMfaModal, setShowMfaModal] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const [otpError, setOtpError] = useState(false);
 
   const fd = state.formData;
   const config = LOAN_CONFIGS[fd.loanType];
@@ -79,6 +80,7 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
 
     // Show MFA Modal instead of submitting directly
     setShowMfaModal(true);
+    setOtpError(false);
   };
 
   const handleOtpChange = (index, value) => {
@@ -86,6 +88,7 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
+    setOtpError(false);
 
     // Auto-focus next input
     if (value && index < 5) {
@@ -94,6 +97,11 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
   };
 
   const processSubmission = async () => {
+    if (otp.join('') !== '123456') {
+      setOtpError(true);
+      return;
+    }
+    
     setShowMfaModal(false);
     setSubmitting(true);
     
@@ -383,11 +391,14 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
               </div>
             </div>
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#f8fafc' }}>2-Step Verification</h3>
-            <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+            <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '0.5rem', lineHeight: '1.5' }}>
               We've sent a 6-digit verification code to your registered mobile number ending in {fd.mobileNumber ? fd.mobileNumber.slice(-4) : 'XXXX'}.
             </p>
+            <p style={{ fontSize: '0.75rem', color: '#3b82f6', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+              (For testing, use OTP: 123456)
+            </p>
             
-            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.5rem' }}>
               {otp.map((digit, i) => (
                 <input
                   key={i}
@@ -395,11 +406,17 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
                   type="text"
                   value={digit}
                   onChange={e => handleOtpChange(i, e.target.value)}
-                  style={{ width: '40px', height: '48px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff', outline: 'none' }}
-                  onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'}
-                  onBlur={e => e.currentTarget.style.borderColor = '#334155'}
+                  style={{ width: '40px', height: '48px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold', background: '#1e293b', border: `1px solid ${otpError ? '#ef4444' : '#334155'}`, borderRadius: '8px', color: '#fff', outline: 'none' }}
+                  onFocus={e => e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#3b82f6'}
+                  onBlur={e => e.currentTarget.style.borderColor = otpError ? '#ef4444' : '#334155'}
                 />
               ))}
+            </div>
+            
+            <div style={{ height: '20px', marginBottom: '1rem' }}>
+              {otpError && (
+                <p style={{ color: '#ef4444', fontSize: '0.75rem', margin: 0 }}>Invalid OTP. Please try again.</p>
+              )}
             </div>
 
             <button 

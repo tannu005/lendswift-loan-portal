@@ -102,20 +102,20 @@ export default function ArchitectureDiagram({ onClose }) {
         <div style={{ position: 'relative', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3rem' }}>
           
           {/* Top Row: Client layer */}
-          <div style={{ display: 'flex', gap: '2rem', width: '100%', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', width: '100%', justifyContent: 'center' }}>
             <Node icon={Smartphone} title="Client Application" desc="Aether Luxe Theme, React + GSAP, Edge-deployed" color="#38bdf8" />
             <Node icon={Shield} title="WAF & API Gateway" desc="Cloudflare + Kong, Multi-Gateway Fallback" color="#10b981" />
           </div>
 
           {/* Middle Row: Microservices */}
-          <div style={{ display: 'flex', gap: '3rem', width: '100%', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', width: '100%', justifyContent: 'center' }}>
             <Node icon={Cpu} title="AI Underwriting Engine" desc="Predictive Analytics & Fraud Detection (ML)" color="#8b5cf6" />
             <Node icon={Server} title="Core Lending Service" desc="Go Microservices on Docker/Kubernetes" color="#3b82f6" />
             <Node icon={Key} title="Compliance & Auth" desc="PCI DSS, AML/KYC, MFA Verification" color="#f43f5e" />
           </div>
 
           {/* Bottom Row: Data & External */}
-          <div style={{ display: 'flex', gap: '4rem', width: '100%', justifyContent: 'center' }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1.5rem', width: '100%', justifyContent: 'center' }}>
             <Node icon={Database} title="Data Layer" desc="PostgreSQL (ACID) + Redis (Cache) Replicas" color="#f59e0b" />
             <Node icon={Activity} title="Auto-Reconciliation" desc="Embedded Finance APIs / Open Banking" color="#14b8a6" />
           </div>
