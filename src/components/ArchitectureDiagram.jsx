@@ -80,9 +80,9 @@ export default function ArchitectureDiagram({ onClose }) {
       }} />
 
       <div className="arch-panel" style={{
-        position: 'relative', width: '100%', maxWidth: '1000px', background: '#020617',
+        position: 'relative', width: '100%', maxWidth: '1000px', maxHeight: '90vh', background: '#020617',
         border: '1px solid #1e293b', borderRadius: '24px', padding: '3rem',
-        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflow: 'hidden'
+        boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)', overflowY: 'auto'
       }}>
         <button onClick={onClose} style={{
           position: 'absolute', top: '1.5rem', right: '1.5rem', background: 'transparent',
