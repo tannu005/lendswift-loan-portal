@@ -5,9 +5,10 @@ import gsap from 'gsap';
 export default function AIChatbot() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { text: "Hi! I'm the LendSwift AI Assistant. How can I help you today?", isBot: true }
+    { text: "Hi! I'm the LendSwift AI Assistant. I can help you with loan details, application status, or technical questions about this project. How can I help you today?", isBot: true }
   ]);
   const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const chatRef = useRef(null);
   const messagesEndRef = useRef(null);
 
@@ -29,13 +30,16 @@ export default function AIChatbot() {
     scrollToBottom();
   }, [messages, isOpen]);
 
-  const handleSend = (e) => {
-    e.preventDefault();
-    if (!input.trim()) return;
+  const handleSend = (e, textOverride = null) => {
+    if (e) e.preventDefault();
+    const messageText = textOverride || input;
+    if (!messageText.trim()) return;
 
-    const userMsg = { text: input, isBot: false };
+    const userMsg = { text: messageText, isBot: false };
     setMessages(prev => [...prev, userMsg]);
     setInput('');
+
+    setIsTyping(true);
 
     // Simulate AI response delay
     setTimeout(() => {
@@ -46,10 +50,10 @@ export default function AIChatbot() {
         botResponse = "Interest rates start at 10.5% p.a. for Personal Loans. You can use the Loan Simulator panel on the right side of the application to see exact EMI breakdowns!";
       } else if (lowerInput.includes('document') || lowerInput.includes('upload') || lowerInput.includes('pan') || lowerInput.includes('aadhaar')) {
         botResponse = "We use an AI-powered OCR system to extract data from your documents securely. Just upload a clear photo of your PAN or Aadhaar card in Step 6.";
-      } else if (lowerInput.includes('fraud') || lowerInput.includes('security') || lowerInput.includes('safe')) {
+      } else if (lowerInput.includes('fraud') || lowerInput.includes('security') || lowerInput.includes('safe') || lowerInput.includes('encryption')) {
         botResponse = "Security is our top priority. We use 256-bit encryption, Govt E-Stamps, and a multi-layered AI fraud detection model that cross-references identity databases in real time.";
-      } else if (lowerInput.includes('eligibility') || lowerInput.includes('qualify') || lowerInput.includes('eligible')) {
-        botResponse = "Eligibility depends on your monthly income, credit score, and existing liabilities. Our AI Underwriting engine calculates this in real-time during Step 8!";
+      } else if (lowerInput.includes('eligibility') || lowerInput.includes('qualify') || lowerInput.includes('eligible') || lowerInput.includes('cibil') || lowerInput.includes('credit score')) {
+        botResponse = "Eligibility depends on your monthly income, credit score (min 650 recommended), and existing liabilities. Our AI Underwriting engine calculates this in real-time during Step 8!";
       } else if (lowerInput.includes('how long') || lowerInput.includes('time') || lowerInput.includes('fast') || lowerInput.includes('duration')) {
         botResponse = "The entire application process takes less than 3 minutes, and disbursement happens instantly for pre-approved customers.";
       } else if (lowerInput.includes('contact') || lowerInput.includes('support') || lowerInput.includes('help') || lowerInput.includes('call')) {
@@ -60,10 +64,17 @@ export default function AIChatbot() {
         botResponse = "You're very welcome! Let me know if you need anything else.";
       } else if (lowerInput.includes('payment') || lowerInput.includes('repay') || lowerInput.includes('upi')) {
         botResponse = "You can make payments via UPI, Credit/Debit cards, or Net Banking from your Applicant Dashboard. We also support automated e-NACH mandates!";
+      } else if (lowerInput.includes('what is lendswift') || lowerInput.includes('about')) {
+        botResponse = "LendSwift is a next-generation digital lending platform. It features instant AI approvals, OCR document scanning, embedded finance APIs, and a completely frictionless UX.";
+      } else if (lowerInput.includes('tech stack') || lowerInput.includes('built with') || lowerInput.includes('architecture')) {
+        botResponse = "The frontend is built with React and Vite, heavily utilizing GSAP for ultra-smooth animations. The backend architecture simulates Go microservices running on Kubernetes, with PostgreSQL and Redis caching.";
+      } else if (lowerInput.includes('resume') || lowerInput.includes('portfolio') || lowerInput.includes('hire')) {
+        botResponse = "This project was built to demonstrate enterprise-grade full-stack capabilities, including complex state management, responsive UI/UX, predictive analytics, and mock AI integrations.";
       }
 
       setMessages(prev => [...prev, { text: botResponse, isBot: true }]);
-    }, 1000);
+      setIsTyping(false);
+    }, 1200);
   };
 
   return (
@@ -161,8 +172,59 @@ export default function AIChatbot() {
                 )}
               </div>
             ))}
+            
+            {isTyping && (
+              <div style={{ display: 'flex', gap: '0.5rem', alignSelf: 'flex-start', maxWidth: '85%' }}>
+                <div style={{ width: '24px', height: '24px', borderRadius: '12px', background: 'rgba(251, 191, 36, 0.1)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, marginTop: '2px' }}>
+                  <Bot size={14} />
+                </div>
+                <div style={{
+                  padding: '0.75rem 1rem',
+                  borderRadius: '12px',
+                  background: '#1e293b',
+                  color: '#e2e8f0',
+                  fontSize: '0.875rem',
+                  borderTopLeftRadius: '2px',
+                  borderTopRightRadius: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.25rem'
+                }}>
+                  <span className="typing-dot" style={{ width: '4px', height: '4px', background: '#94a3b8', borderRadius: '50%', animation: 'blink 1.4s infinite both' }} />
+                  <span className="typing-dot" style={{ width: '4px', height: '4px', background: '#94a3b8', borderRadius: '50%', animation: 'blink 1.4s infinite both 0.2s' }} />
+                  <span className="typing-dot" style={{ width: '4px', height: '4px', background: '#94a3b8', borderRadius: '50%', animation: 'blink 1.4s infinite both 0.4s' }} />
+                </div>
+              </div>
+            )}
+            
+            <style>{`
+              @keyframes blink {
+                0% { opacity: 0.2; }
+                20% { opacity: 1; }
+                100% { opacity: 0.2; }
+              }
+            `}</style>
             <div ref={messagesEndRef} />
           </div>
+
+          {/* Quick Replies */}
+          {messages.length < 3 && !isTyping && (
+            <div style={{ padding: '0 1rem 0.75rem 1rem', display: 'flex', gap: '0.5rem', overflowX: 'auto', flexWrap: 'nowrap', WebkitOverflowScrolling: 'touch', scrollbarWidth: 'none' }}>
+              {['Tech Stack?', 'Check Eligibility', 'Security'].map((txt) => (
+                <button
+                  key={txt}
+                  onClick={() => {
+                    handleSend(null, txt);
+                  }}
+                  style={{ whiteSpace: 'nowrap', background: '#1e293b', border: '1px solid #334155', color: '#94a3b8', fontSize: '0.75rem', padding: '0.4rem 0.75rem', borderRadius: '100px', cursor: 'pointer', transition: 'all 0.2s' }}
+                  onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = 'var(--color-primary)'; }}
+                  onMouseOut={(e) => { e.currentTarget.style.color = '#94a3b8'; e.currentTarget.style.borderColor = '#334155'; }}
+                >
+                  {txt}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Input Area */}
           <form onSubmit={handleSend} style={{ padding: '1rem', borderTop: '1px solid #1e293b', background: '#020617', display: 'flex', gap: '0.5rem' }}>
