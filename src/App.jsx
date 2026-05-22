@@ -14,8 +14,10 @@ import Step5Employment from './components/steps/Step5Employment';
 import Step6CoApplicant from './components/steps/Step6CoApplicant';
 import Step7Documents from './components/steps/Step7Documents';
 import Step8Review from './components/steps/Step8Review';
+import Step9RiskAnalysis from './components/steps/Step9RiskAnalysis';
 import ApplicantDashboard from './components/ApplicantDashboard';
 import LoanSimulationDashboard from './components/LoanSimulationDashboard';
+import AdminDashboard from './components/admin/AdminDashboard';
 import './App.css';
 
 const STEP_NAMES = {
@@ -28,6 +30,7 @@ const STEP_NAMES = {
   6: 'Co-applicant',
   7: 'Documents',
   8: 'Review',
+  9: 'AI Risk Analysis',
 };
 
 function WizardContainer() {
@@ -82,14 +85,16 @@ function WizardContainer() {
       case 5: return <Step5Employment onNext={handleNext} onBack={handleBack} />;
       case 6: return <Step6CoApplicant onNext={handleNext} onBack={handleBack} />;
       case 7: return <Step7Documents onNext={handleNext} onBack={handleBack} />;
-      case 8: return <Step8Review onBack={handleBack} />;
+      case 8: return <Step8Review onBack={handleBack} onNext={handleNext} />;
+      case 9: return <Step9RiskAnalysis onNext={handleNext} />;
+      case 'admin': return <AdminDashboard onBack={() => setStep(0)} />;
       default: return null;
     }
   };
 
-  const activeSteps = [1, 2, 3, 4, 5, 6, 7, 8];
+  const activeSteps = [1, 2, 3, 4, 5, 6, 7, 8, 9];
   const appStepIndex = activeSteps.indexOf(currentStep);
-  const progressPercent = currentStep === 0 ? 0 : Math.round(
+  const progressPercent = typeof currentStep !== 'number' ? 0 : currentStep === 0 ? 0 : Math.round(
     (appStepIndex / (activeSteps.length - 1)) * 100
   );
 
@@ -157,17 +162,19 @@ function WizardContainer() {
         </div>
         
         {/* Progress Bar Top Right */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '250px', pointerEvents: 'auto' }}>
-          <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', minWidth: '35px', textAlign: 'right' }}>{progressPercent}%</span>
-          <div className="progress-track" style={{ flex: 1, background: 'rgba(255,255,255,0.1)', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
-            <div className="progress-fill" style={{ width: `${progressPercent}%`, background: '#fbbf24', height: '100%', transition: 'width 0.5s ease-out' }} />
+        {typeof currentStep === 'number' && currentStep > 0 && (
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '250px', pointerEvents: 'auto' }}>
+            <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)', minWidth: '35px', textAlign: 'right' }}>{progressPercent}%</span>
+            <div className="progress-track" style={{ flex: 1, background: 'rgba(255,255,255,0.1)', height: '4px', borderRadius: '2px', overflow: 'hidden' }}>
+              <div className="progress-fill" style={{ width: `${progressPercent}%`, background: '#fbbf24', height: '100%', transition: 'width 0.5s ease-out' }} />
+            </div>
+            {lastSaved && (
+              <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>
+                Saved
+              </span>
+            )}
           </div>
-          {lastSaved && (
-            <span style={{ fontSize: '0.625rem', color: 'var(--color-text-muted)', marginLeft: '0.5rem' }}>
-              Saved
-            </span>
-          )}
-        </div>
+        )}
       </header>
 
       {/* Main Immersive Workspace */}
@@ -210,7 +217,7 @@ function WizardContainer() {
           </div>
 
           {/* Dynamic Data Dashboard (Floating Spatial Panel) */}
-          {currentStep > 0 && currentStep < 8 && (
+          {currentStep > 0 && currentStep !== 'admin' && (
             <div style={{ flex: '0 0 480px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <div style={{ 
                 width: '100%', 

@@ -2,6 +2,7 @@ import { useState, useRef, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 import SignatureCanvas from 'react-signature-canvas';
 import { useFormContext } from '../../context/FormContext';
+import gsap from 'gsap';
 import { LOAN_TYPE_HOME, LOAN_TYPE_BUSINESS, EMPLOYMENT_SALARIED, EMPLOYMENT_SELF_EMPLOYED, EMPLOYMENT_BUSINESS_OWNER, ACCEPTED_DOC_TYPES, ACCEPTED_IMAGE_TYPES, MAX_FILE_SIZE_BYTES } from '../../utils/constants';
 import { compressImage, formatFileSize } from '../../utils/imageCompression';
 import { Upload, FileText, X, ChevronLeft, ChevronRight, Lock, ShieldCheck, CheckCircle } from 'lucide-react';
@@ -47,6 +48,9 @@ const getRequiredDocs = (loanType, employmentType, panVerified) => {
 function FileUploadField({ doc, files, onFilesChange }) {
   const [compressing, setCompressing] = useState(false);
   const [compressionInfo, setCompressionInfo] = useState(null);
+  const [isScanning, setIsScanning] = useState(false);
+  const [scanComplete, setScanComplete] = useState(false);
+  const previewRef = useRef(null);
 
   const onDrop = useCallback(async (acceptedFiles) => {
     const processedFiles = [];
@@ -72,6 +76,26 @@ function FileUploadField({ doc, files, onFilesChange }) {
     }
     
     onFilesChange(doc.key, processedFiles);
+
+    // Trigger AI Scan Simulation
+    if (processedFiles.length > 0) {
+      setIsScanning(true);
+      setScanComplete(false);
+      
+      // GSAP Animation for laser
+      setTimeout(() => {
+        if (previewRef.current) {
+          gsap.fromTo('.scan-laser', 
+            { top: '0%', opacity: 1 }, 
+            { top: '100%', duration: 1.2, ease: 'power2.inOut', repeat: 1, yoyo: true, onComplete: () => {
+              setIsScanning(false);
+              setScanComplete(true);
+              gsap.fromTo('.ocr-badge', { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, stagger: 0.1, ease: 'back.out(2)' });
+            }}
+          );
+        }
+      }, 100);
+    }
   }, [doc.key, onFilesChange]);
 
   const { getRootProps, getInputProps, isDragActive, isDragReject } = useDropzone({
@@ -156,11 +180,24 @@ function FileUploadField({ doc, files, onFilesChange }) {
               border: '1px solid var(--color-border)',
             }}>
               {file.type?.startsWith('image/') ? (
-                <img
-                  src={URL.createObjectURL(file)}
-                  alt={file.name}
-                  style={{ width: '32px', height: '32px', objectFit: 'cover', borderRadius: '3px' }}
-                />
+                <div style={{ position: 'relative', overflow: 'hidden', borderRadius: '3px' }} ref={previewRef}>
+                  <img
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    style={{ width: '32px', height: '32px', objectFit: 'cover' }}
+                  />
+                  {isScanning && (
+                    <div className="scan-laser" style={{
+                      position: 'absolute',
+                      left: 0,
+                      right: 0,
+                      height: '2px',
+                      background: '#10b981',
+                      boxShadow: '0 0 8px #10b981',
+                      zIndex: 10
+                    }} />
+                  )}
+                </div>
               ) : (
                 <FileText size={16} style={{ color: 'var(--color-text-muted)', flexShrink: 0 }} />
               )}
@@ -187,6 +224,18 @@ function FileUploadField({ doc, files, onFilesChange }) {
               </button>
             </div>
           ))}
+        </div>
+      )}
+
+      {/* AI OCR Badges */}
+      {scanComplete && hasFiles && (
+        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+          <span className="ocr-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.625rem', background: 'rgba(16, 185, 129, 0.1)', color: '#10b981', padding: '0.125rem 0.375rem', borderRadius: '4px', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+            <ShieldCheck size={10} /> Fraud Check Passed
+          </span>
+          <span className="ocr-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.625rem', background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', padding: '0.125rem 0.375rem', borderRadius: '4px', border: '1px solid rgba(59, 130, 246, 0.2)' }}>
+            <FileText size={10} /> OCR Data Extracted
+          </span>
         </div>
       )}
 

@@ -31,7 +31,7 @@ function DataRow({ label, value }) {
   );
 }
 
-export default function Step8Review({ onPrev, onGoToStep }) {
+export default function Step8Review({ onPrev, onGoToStep, onNext }) {
   const { state, submitApplication, getMonthlyIncome, isStep6Required } = useFormContext();
   const [consents, setConsents] = useState({
     confirmAccuracy: false,
@@ -96,6 +96,9 @@ export default function Step8Review({ onPrev, onGoToStep }) {
     } catch (err) {
       console.warn('Failed to clear post-submit draft:', err);
     }
+    
+    // Proceed to Step 9: AI Risk Analysis
+    if (onNext) onNext();
   };
 
   return (
@@ -343,7 +346,7 @@ export default function Step8Review({ onPrev, onGoToStep }) {
             </>
           ) : (
             <>
-              Submit application
+              Submit for AI Risk Assessment
               <ChevronRight size={16} />
             </>
           )}

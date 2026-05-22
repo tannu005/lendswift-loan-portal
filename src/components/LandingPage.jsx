@@ -1,9 +1,11 @@
-import React, { useEffect, useRef } from 'react';
-import { ArrowRight, Zap, Shield, Clock } from 'lucide-react';
+import React, { useEffect, useRef, useState } from 'react';
+import { ArrowRight, Zap, Shield, Clock, Lock, Server } from 'lucide-react';
 import gsap from 'gsap';
+import ArchitectureDiagram from './ArchitectureDiagram';
 
-export default function LandingPage({ onStart }) {
+export default function LandingPage({ onStart, onAdminLogin }) {
   const containerRef = useRef(null);
+  const [showArchitecture, setShowArchitecture] = useState(false);
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -144,7 +146,53 @@ export default function LandingPage({ onStart }) {
             <Clock size={16} /> 3-Minute Approval
           </div>
         </div>
+
+        {/* Enterprise Portfolio Links */}
+        <div className="stagger-in" style={{ marginTop: '3rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+           <button 
+             onClick={onAdminLogin}
+             style={{
+               background: 'transparent',
+               color: 'var(--color-text-secondary)',
+               border: '1px solid rgba(255,255,255,0.1)',
+               padding: '0.5rem 1rem',
+               borderRadius: '6px',
+               fontSize: '0.875rem',
+               cursor: 'pointer',
+               display: 'inline-flex',
+               alignItems: 'center',
+               gap: '0.5rem',
+               transition: 'all 0.2s'
+             }}
+             onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#fbbf24'; }}
+             onMouseOut={(e) => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+           >
+             <Lock size={14} /> Underwriter OS Login
+           </button>
+           <button 
+             onClick={() => setShowArchitecture(true)}
+             style={{
+               background: 'transparent',
+               color: 'var(--color-text-secondary)',
+               border: '1px solid rgba(255,255,255,0.1)',
+               padding: '0.5rem 1rem',
+               borderRadius: '6px',
+               fontSize: '0.875rem',
+               cursor: 'pointer',
+               display: 'inline-flex',
+               alignItems: 'center',
+               gap: '0.5rem',
+               transition: 'all 0.2s'
+             }}
+             onMouseOver={(e) => { e.currentTarget.style.color = '#fff'; e.currentTarget.style.borderColor = '#3b82f6'; }}
+             onMouseOut={(e) => { e.currentTarget.style.color = 'var(--color-text-secondary)'; e.currentTarget.style.borderColor = 'rgba(255,255,255,0.1)'; }}
+           >
+             <Server size={14} /> View Architecture Diagram
+           </button>
+        </div>
       </div>
+      
+      {showArchitecture && <ArchitectureDiagram onClose={() => setShowArchitecture(false)} />}
     </div>
   );
 }
