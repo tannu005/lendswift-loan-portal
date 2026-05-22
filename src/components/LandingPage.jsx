@@ -134,16 +134,20 @@ export default function LandingPage({ onStart, onAdminLogin }) {
             display: 'flex',
             justifyContent: 'center',
             gap: '2rem',
+            flexWrap: 'wrap',
             marginTop: '4rem',
             paddingTop: '2rem',
             borderTop: '1px solid rgba(255, 255, 255, 0.05)'
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-            <Shield size={16} /> 256-bit Encryption
+            <Shield size={16} /> PCI DSS & AML/KYC Ready
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
-            <Clock size={16} /> 3-Minute Approval
+            <Clock size={16} /> AI-Powered 3-Min Approval
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-text-muted)', fontSize: '0.875rem' }}>
+            <Zap size={16} /> Premium Aether Luxe Theme
           </div>
         </div>
 

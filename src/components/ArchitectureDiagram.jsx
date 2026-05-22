@@ -103,21 +103,21 @@ export default function ArchitectureDiagram({ onClose }) {
           
           {/* Top Row: Client layer */}
           <div style={{ display: 'flex', gap: '2rem', width: '100%', justifyContent: 'center' }}>
-            <Node icon={Smartphone} title="Client Application" desc="React + GSAP Frontend, Edge-deployed" color="#38bdf8" />
-            <Node icon={Shield} title="WAF & API Gateway" desc="Cloudflare + Kong, Rate Limiting & Auth" color="#10b981" />
+            <Node icon={Smartphone} title="Client Application" desc="Aether Luxe Theme, React + GSAP, Edge-deployed" color="#38bdf8" />
+            <Node icon={Shield} title="WAF & API Gateway" desc="Cloudflare + Kong, Multi-Gateway Fallback" color="#10b981" />
           </div>
 
           {/* Middle Row: Microservices */}
           <div style={{ display: 'flex', gap: '3rem', width: '100%', justifyContent: 'center' }}>
-            <Node icon={Cpu} title="AI Underwriting Engine" desc="Python/TensorFlow, Real-time Risk Scoring" color="#8b5cf6" />
-            <Node icon={Server} title="Core Lending Service" desc="Go Microservices, Kafka Event Streaming" color="#3b82f6" />
-            <Node icon={Activity} title="Bureau Integration" desc="Experian/CIBIL API Aggregator" color="#ef4444" />
+            <Node icon={Cpu} title="AI Underwriting Engine" desc="Predictive Analytics & Fraud Detection (ML)" color="#8b5cf6" />
+            <Node icon={Server} title="Core Lending Service" desc="Go Microservices on Docker/Kubernetes" color="#3b82f6" />
+            <Node icon={Key} title="Compliance & Auth" desc="PCI DSS, AML/KYC, MFA Verification" color="#f43f5e" />
           </div>
 
           {/* Bottom Row: Data & External */}
           <div style={{ display: 'flex', gap: '4rem', width: '100%', justifyContent: 'center' }}>
-            <Node icon={Database} title="Data Layer" desc="PostgreSQL (ACID) + Redis (Cache)" color="#f59e0b" />
-            <Node icon={Cloud} title="Open Banking APIs" desc="Account Aggregator / Plaid Integration" color="#14b8a6" />
+            <Node icon={Database} title="Data Layer" desc="PostgreSQL (ACID) + Redis (Cache) Replicas" color="#f59e0b" />
+            <Node icon={Activity} title="Auto-Reconciliation" desc="Embedded Finance APIs / Open Banking" color="#14b8a6" />
           </div>
 
         </div>

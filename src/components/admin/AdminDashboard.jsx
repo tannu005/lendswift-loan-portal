@@ -209,12 +209,12 @@ export default function AdminDashboard({ onBack }) {
             <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '1.5rem' }}>
               <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <ShieldCheck size={18} color="#ef4444" />
-                Compliance & Audit Log
+                PCI DSS & AML Compliance Audit
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.75rem', fontFamily: 'monospace', color: '#94a3b8' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>[09:42:12] SYSTEM</span>
-                  <span style={{ color: '#10b981' }}>KAFKA QUEUE SYNCED</span>
+                  <span style={{ color: '#10b981' }}>AML/KYC CHECK PASSED</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>[09:40:05] ADMIN_04</span>
@@ -222,7 +222,7 @@ export default function AdminDashboard({ onBack }) {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>[09:35:22] SYSTEM</span>
-                  <span style={{ color: '#10b981' }}>S3 BACKUP COMPLETE</span>
+                  <span style={{ color: '#10b981' }}>PCI DSS VAULT SYNCED</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <span>[09:15:00] WEBHOOK</span>
@@ -234,25 +234,25 @@ export default function AdminDashboard({ onBack }) {
             <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '1.5rem' }}>
                <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Server size={18} color="#3b82f6" />
-                Infrastructure Health
+                Infrastructure & A/B Testing
               </h2>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem', color: '#94a3b8' }}>
-                    <span>K8s Cluster Load</span>
-                    <span>42%</span>
+                    <span>Payment Gateway Fallback</span>
+                    <span>Stripe (Active)</span>
                   </div>
                   <div style={{ width: '100%', height: '4px', background: '#1e293b', borderRadius: '2px' }}>
-                    <div style={{ width: '42%', height: '100%', background: '#3b82f6', borderRadius: '2px' }} />
+                    <div style={{ width: '100%', height: '100%', background: '#10b981', borderRadius: '2px' }} />
                   </div>
                 </div>
                 <div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.75rem', marginBottom: '0.25rem', color: '#94a3b8' }}>
-                    <span>PostgreSQL Replicas</span>
-                    <span>Healthy (3/3)</span>
+                    <span>A/B Test: V2 Loan Flow Conv.</span>
+                    <span>+14.2% Lift</span>
                   </div>
                   <div style={{ width: '100%', height: '4px', background: '#1e293b', borderRadius: '2px' }}>
-                    <div style={{ width: '100%', height: '100%', background: '#10b981', borderRadius: '2px' }} />
+                    <div style={{ width: '64%', height: '100%', background: '#8b5cf6', borderRadius: '2px' }} />
                   </div>
                 </div>
               </div>
