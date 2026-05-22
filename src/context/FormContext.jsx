@@ -116,8 +116,9 @@ export function FormProvider({ children }) {
     };
 
     try {
+      const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
       // POST to our new Node.js/Express backend
-      const response = await fetch('http://localhost:5000/api/applications', {
+      const response = await fetch(`${apiUrl}/api/applications`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(applicationData)

@@ -20,7 +20,8 @@ export default function AdminDashboard({ onBack }) {
     // Fetch data from backend
     const fetchApplications = async () => {
       try {
-        const response = await fetch('http://localhost:5000/api/applications');
+        const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const response = await fetch(`${apiUrl}/api/applications`);
         if (response.ok) {
           const data = await response.json();
           // Transform backend data to match dashboard format
