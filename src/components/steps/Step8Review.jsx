@@ -46,6 +46,7 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
   const [showMfaModal, setShowMfaModal] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [otpError, setOtpError] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState('');
 
   const fd = state.formData;
   const config = LOAN_CONFIGS[fd.loanType];
@@ -78,26 +79,37 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
       return;
     }
 
-    // Show MFA Modal instead of submitting directly
+    // Generate a random 6-digit OTP
+    const newOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    setGeneratedOtp(newOtp);
+
+    // Show MFA Modal
     setShowMfaModal(true);
     setOtpError(false);
+    setOtp(['', '', '', '', '', '']); // Reset input fields
+
+    // Simulate sending an SMS to the user's phone
+    setTimeout(() => {
+      alert(`📩 SMS from LendSwift:\n\nYour loan application verification code is: ${newOtp}. Do not share this with anyone.`);
+    }, 1000);
   };
 
   const handleOtpChange = (index, value) => {
     if (value.length > 1) return; // Prevent multiple chars
-    const newOtp = [...otp];
-    newOtp[index] = value;
-    setOtp(newOtp);
+    const newOtpArr = [...otp];
+    newOtpArr[index] = value;
+    setOtp(newOtpArr);
     setOtpError(false);
 
     // Auto-focus next input
     if (value && index < 5) {
-      document.getElementById(`otp-${index + 1}`).focus();
+      const nextInput = document.getElementById(`otp-${index + 1}`);
+      if (nextInput) nextInput.focus();
     }
   };
 
   const processSubmission = async () => {
-    if (otp.join('') !== '123456') {
+    if (otp.join('') !== generatedOtp) {
       setOtpError(true);
       return;
     }
@@ -393,9 +405,6 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
             <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#f8fafc' }}>2-Step Verification</h3>
             <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '0.5rem', lineHeight: '1.5' }}>
               We've sent a 6-digit verification code to your registered mobile number ending in {fd.mobileNumber ? fd.mobileNumber.slice(-4) : 'XXXX'}.
-            </p>
-            <p style={{ fontSize: '0.75rem', color: '#3b82f6', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-              (For testing, use OTP: 123456)
             </p>
             
             <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '0.5rem' }}>
