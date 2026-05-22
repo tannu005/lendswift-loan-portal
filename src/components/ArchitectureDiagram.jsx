@@ -107,18 +107,6 @@ export default function ArchitectureDiagram({ onClose }) {
             <Node icon={Shield} title="WAF & API Gateway" desc="Cloudflare + Kong, Rate Limiting & Auth" color="#10b981" />
           </div>
 
-          {/* SVG Connecting Lines (Absolute behind nodes) */}
-          <svg style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', zIndex: 1, pointerEvents: 'none' }}>
-            <path className="data-flow" d="M 390 120 L 510 120" stroke="#10b981" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            <path className="data-flow" d="M 500 170 C 500 220, 250 200, 250 250" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            <path className="data-flow" d="M 500 170 C 500 220, 500 200, 500 250" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            <path className="data-flow" d="M 500 170 C 500 220, 750 200, 750 250" stroke="#3b82f6" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            
-            <path className="data-flow" d="M 250 380 C 250 420, 380 430, 380 480" stroke="#8b5cf6" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            <path className="data-flow" d="M 500 380 C 500 420, 500 430, 500 480" stroke="#f59e0b" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-            <path className="data-flow" d="M 750 380 C 750 420, 620 430, 620 480" stroke="#ef4444" strokeWidth="2" strokeDasharray="5,5" fill="none" opacity="0.5" />
-          </svg>
-
           {/* Middle Row: Microservices */}
           <div style={{ display: 'flex', gap: '3rem', width: '100%', justifyContent: 'center' }}>
             <Node icon={Cpu} title="AI Underwriting Engine" desc="Python/TensorFlow, Real-time Risk Scoring" color="#8b5cf6" />

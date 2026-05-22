@@ -18,6 +18,7 @@ import Step9RiskAnalysis from './components/steps/Step9RiskAnalysis';
 import ApplicantDashboard from './components/ApplicantDashboard';
 import LoanSimulationDashboard from './components/LoanSimulationDashboard';
 import AdminDashboard from './components/admin/AdminDashboard';
+import AIChatbot from './components/AIChatbot';
 import './App.css';
 
 const STEP_NAMES = {
@@ -299,7 +300,7 @@ function AppContent() {
     return (
       <>
         <ThreeBackground />
-        <LandingPage onStart={() => setStep(1)} />
+        <LandingPage onStart={() => setStep(1)} onAdminLogin={() => setStep('admin')} />
       </>
     );
   }
@@ -317,6 +318,7 @@ export default function App() {
     <FormProvider>
       <CustomCursor />
       <AppContent />
+      <AIChatbot />
     </FormProvider>
   );
 }

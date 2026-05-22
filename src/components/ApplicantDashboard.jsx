@@ -14,7 +14,13 @@ import {
   ArrowRight, 
   Sliders,
   RotateCcw,
-  ExternalLink
+  ExternalLink,
+  CreditCard,
+  Award,
+  TrendingUp,
+  Wallet,
+  Smartphone,
+  Check
 } from 'lucide-react';
 
 const STATUSES = {
@@ -62,6 +68,10 @@ export default function ApplicantDashboard() {
   const [agreementAccepted, setAgreementAccepted] = useState(false);
   const [disbursing, setDisbursing] = useState(false);
   const [disbursed, setDisbursed] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [autoDebit, setAutoDebit] = useState(false);
+  const [points, setPoints] = useState(450);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   const fd = state.formData;
   const config = LOAN_CONFIGS[fd.loanType || 'personal'];
@@ -75,6 +85,15 @@ export default function ApplicantDashboard() {
     await new Promise(resolve => setTimeout(resolve, 3000));
     setDisbursing(false);
     setDisbursed(true);
+  };
+
+  const handleSimulatePayment = () => {
+    setPaymentSuccess(true);
+    setTimeout(() => {
+      setPaymentSuccess(false);
+      setShowPaymentModal(false);
+      setPoints(prev => prev + 50); // Gamification boost
+    }, 2000);
   };
 
   const steps = [
@@ -361,6 +380,56 @@ export default function ApplicantDashboard() {
             </div>
           </div>
 
+          {/* Repayment & Gamification Hub (V2 Feature) */}
+          {disbursed && (
+            <div className="card" style={{ padding: '1.5rem', marginTop: '1.5rem', background: 'linear-gradient(145deg, rgba(16, 185, 129, 0.05) 0%, rgba(15, 23, 42, 0.8) 100%)', border: '1px solid rgba(16, 185, 129, 0.2)' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                <div>
+                  <h3 style={{ fontSize: '1.125rem', fontWeight: '600', color: 'var(--color-text-primary)', display: 'flex', alignItems: 'center', gap: '0.5rem', margin: '0 0 0.25rem 0' }}>
+                    <Wallet size={18} color="#10b981" /> Repayment Hub
+                  </h3>
+                  <p style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)', margin: 0 }}>Manage your active loan & rewards</p>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: 'rgba(251, 191, 36, 0.1)', border: '1px solid rgba(251, 191, 36, 0.3)', padding: '0.375rem 0.75rem', borderRadius: '100px' }}>
+                  <Award size={14} color="#fbbf24" />
+                  <span style={{ fontSize: '0.75rem', fontWeight: '600', color: '#fbbf24' }}>{points} Loyalty Pts</span>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: 'rgba(0,0,0,0.2)', padding: '1rem', borderRadius: '8px' }}>
+                  <div>
+                    <span style={{ fontSize: '0.6875rem', color: 'var(--color-text-muted)', textTransform: 'uppercase', letterSpacing: '0.05em' }}>Upcoming EMI</span>
+                    <div style={{ fontSize: '1.25rem', fontWeight: 'bold', color: 'var(--color-text-primary)', marginTop: '0.125rem' }}>{formatIndianCurrency(emiResult.emi)}</div>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-secondary)' }}>Due on 5th of next month</span>
+                  </div>
+                  <button onClick={() => setShowPaymentModal(true)} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+                    Pay Now
+                  </button>
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.75rem 1rem', background: 'rgba(255,255,255,0.03)', borderRadius: '8px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                  <div>
+                    <span style={{ fontSize: '0.875rem', fontWeight: '500', color: 'var(--color-text-primary)', display: 'block' }}>e-NACH Auto-Debit</span>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>Automatically pay from verified bank</span>
+                  </div>
+                  <button onClick={() => setAutoDebit(!autoDebit)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
+                    <div style={{ width: '40px', height: '22px', background: autoDebit ? '#10b981' : '#334155', borderRadius: '11px', position: 'relative', transition: 'background 0.2s' }}>
+                      <div style={{ width: '18px', height: '18px', background: '#fff', borderRadius: '50%', position: 'absolute', top: '2px', left: autoDebit ? '20px' : '2px', transition: 'left 0.2s', boxShadow: '0 1px 3px rgba(0,0,0,0.3)' }} />
+                    </div>
+                  </button>
+                </div>
+                
+                <div style={{ padding: '0.75rem', background: 'rgba(59, 130, 246, 0.05)', borderRadius: '8px', border: '1px solid rgba(59, 130, 246, 0.1)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                   <TrendingUp size={16} color="#3b82f6" style={{ flexShrink: 0 }} />
+                   <span style={{ fontSize: '0.75rem', color: '#94a3b8', lineHeight: '1.4' }}>
+                     <strong style={{ color: '#3b82f6' }}>Credit Boost Simulator:</strong> Paying your EMI on time will simulate a +12 point boost to your Experian score next month.
+                   </span>
+                </div>
+              </div>
+            </div>
+          )}
+
         </div>
 
         {/* Right Column: Timeline & Support */}
@@ -544,6 +613,45 @@ export default function ApplicantDashboard() {
           <p style={{ fontSize: '0.8rem', color: 'var(--color-text-secondary)', lineHeight: '1.5', margin: 0 }}>{statusInfo.description}</p>
         </div>
       </div>
+
+      {/* Payment Simulator Modal */}
+      {showPaymentModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in card" style={{ padding: '2rem', maxWidth: '400px', width: '90%', background: '#0f172a', border: '1px solid #1e293b' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+              <h3 style={{ margin: 0, fontSize: '1.125rem', color: '#f8fafc' }}>Complete Payment</h3>
+              <button onClick={() => setShowPaymentModal(false)} style={{ background: 'transparent', border: 'none', color: '#94a3b8', cursor: 'pointer' }}><XCircle size={20} /></button>
+            </div>
+            
+            {paymentSuccess ? (
+              <div style={{ textAlign: 'center', padding: '2rem 0' }}>
+                <div style={{ display: 'inline-flex', background: '#10b981', color: '#fff', padding: '1rem', borderRadius: '50%', marginBottom: '1rem' }}>
+                  <Check size={32} />
+                </div>
+                <h4 style={{ fontSize: '1.25rem', color: '#10b981', margin: '0 0 0.5rem 0' }}>Payment Successful!</h4>
+                <p style={{ fontSize: '0.875rem', color: '#94a3b8', margin: 0 }}>+50 Loyalty Points earned.</p>
+              </div>
+            ) : (
+              <>
+                <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fff', textAlign: 'center', marginBottom: '2rem' }}>
+                  {formatIndianCurrency(emiResult.emi)}
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                  <button onClick={handleSimulatePayment} style={{ background: '#1e293b', border: '1px solid #334155', padding: '1rem', borderRadius: '8px', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.borderColor = '#3b82f6'}>
+                    <Smartphone size={20} color="#38bdf8" /> Pay via UPI (PhonePe / GPay)
+                  </button>
+                  <button onClick={handleSimulatePayment} style={{ background: '#1e293b', border: '1px solid #334155', padding: '1rem', borderRadius: '8px', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.borderColor = '#3b82f6'}>
+                    <CreditCard size={20} color="#f43f5e" /> Credit / Debit Card
+                  </button>
+                  <button onClick={handleSimulatePayment} style={{ background: '#1e293b', border: '1px solid #334155', padding: '1rem', borderRadius: '8px', color: '#fff', display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer', transition: 'all 0.2s' }} onMouseOver={e => e.currentTarget.style.borderColor = '#3b82f6'}>
+                    <Wallet size={20} color="#fbbf24" /> Net Banking
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

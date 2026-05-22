@@ -43,6 +43,8 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
   const [submitted, setSubmitted] = useState(false);
   const [appId, setAppId] = useState('');
   const [consentErrors, setConsentErrors] = useState({});
+  const [showMfaModal, setShowMfaModal] = useState(false);
+  const [otp, setOtp] = useState(['', '', '', '', '', '']);
 
   const fd = state.formData;
   const config = LOAN_CONFIGS[fd.loanType];
@@ -75,6 +77,24 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
       return;
     }
 
+    // Show MFA Modal instead of submitting directly
+    setShowMfaModal(true);
+  };
+
+  const handleOtpChange = (index, value) => {
+    if (value.length > 1) return; // Prevent multiple chars
+    const newOtp = [...otp];
+    newOtp[index] = value;
+    setOtp(newOtp);
+
+    // Auto-focus next input
+    if (value && index < 5) {
+      document.getElementById(`otp-${index + 1}`).focus();
+    }
+  };
+
+  const processSubmission = async () => {
+    setShowMfaModal(false);
     setSubmitting(true);
     
     // Simulate submission delay
@@ -352,6 +372,56 @@ export default function Step8Review({ onPrev, onGoToStep, onNext }) {
           )}
         </button>
       </div>
+
+      {/* MFA OTP Modal */}
+      {showMfaModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div className="animate-fade-in card" style={{ padding: '2rem', maxWidth: '400px', width: '90%', background: '#0f172a', border: '1px solid #1e293b', textAlign: 'center' }}>
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1rem' }}>
+              <div style={{ background: 'rgba(59, 130, 246, 0.1)', color: '#3b82f6', width: '48px', height: '48px', borderRadius: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Lock size={24} />
+              </div>
+            </div>
+            <h3 style={{ margin: '0 0 0.5rem 0', fontSize: '1.25rem', color: '#f8fafc' }}>2-Step Verification</h3>
+            <p style={{ fontSize: '0.875rem', color: '#94a3b8', marginBottom: '1.5rem', lineHeight: '1.5' }}>
+              We've sent a 6-digit verification code to your registered mobile number ending in {fd.mobileNumber ? fd.mobileNumber.slice(-4) : 'XXXX'}.
+            </p>
+            
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', marginBottom: '1.5rem' }}>
+              {otp.map((digit, i) => (
+                <input
+                  key={i}
+                  id={`otp-${i}`}
+                  type="text"
+                  value={digit}
+                  onChange={e => handleOtpChange(i, e.target.value)}
+                  style={{ width: '40px', height: '48px', textAlign: 'center', fontSize: '1.25rem', fontWeight: 'bold', background: '#1e293b', border: '1px solid #334155', borderRadius: '8px', color: '#fff', outline: 'none' }}
+                  onFocus={e => e.currentTarget.style.borderColor = '#3b82f6'}
+                  onBlur={e => e.currentTarget.style.borderColor = '#334155'}
+                />
+              ))}
+            </div>
+
+            <button 
+              type="button"
+              onClick={processSubmission}
+              disabled={otp.join('').length !== 6}
+              className="btn btn-primary"
+              style={{ width: '100%', padding: '0.75rem', fontSize: '1rem', display: 'flex', justifyContent: 'center' }}
+            >
+              Verify & Submit Application
+            </button>
+            <button 
+              type="button" 
+              onClick={() => setShowMfaModal(false)}
+              style={{ background: 'none', border: 'none', color: '#64748b', fontSize: '0.875rem', marginTop: '1rem', cursor: 'pointer' }}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
     </form>
   );
 }

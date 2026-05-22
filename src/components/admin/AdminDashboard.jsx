@@ -4,10 +4,10 @@ import { formatIndianCurrency } from '../../utils/validators';
 
 const DUMMY_APPLICATIONS = [
   { id: 'APP-9982', name: 'Rahul Sharma', type: 'Personal', amount: 500000, riskScore: 780, status: 'Approved', date: '2m ago' },
-  { id: 'APP-9981', name: 'Priya Patel', type: 'Home', amount: 4500000, riskScore: 710, status: 'Review', date: '15m ago' },
+  { id: 'APP-9981', name: 'Priya Patel', type: 'Home', amount: 4500000, riskScore: 710, status: 'Review', date: '15m ago', fraudFlag: 'Mismatched IP' },
   { id: 'APP-9980', name: 'Amit Kumar', type: 'Business', amount: 1200000, riskScore: 580, status: 'Rejected', date: '1h ago' },
   { id: 'APP-9979', name: 'Sneha Gupta', type: 'Personal', amount: 200000, riskScore: 820, status: 'Approved', date: '2h ago' },
-  { id: 'APP-9978', name: 'Vikram Singh', type: 'Home', amount: 8000000, riskScore: 690, status: 'Review', date: '3h ago' },
+  { id: 'APP-9978', name: 'Vikram Singh', type: 'Home', amount: 8000000, riskScore: 690, status: 'Review', date: '3h ago', fraudFlag: 'Fake PAN Detected' },
 ];
 
 export default function AdminDashboard({ onBack }) {
@@ -129,13 +129,13 @@ export default function AdminDashboard({ onBack }) {
         </div>
 
         {role === 'admin' && (
-           <div style={{ background: '#450a0a', border: '1px solid #7f1d1d', padding: '1.5rem', borderRadius: '12px' }}>
-             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#fca5a5', marginBottom: '1rem' }}>
-               <span style={{ fontSize: '0.875rem' }}>System Anomalies</span>
+           <div style={{ background: '#022c22', border: '1px solid #064e3b', padding: '1.5rem', borderRadius: '12px' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', color: '#6ee7b7', marginBottom: '1rem' }}>
+               <span style={{ fontSize: '0.875rem' }}>Bank Settlements (Auto-Reconciled)</span>
                <Activity size={18} />
              </div>
-             <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fff' }}>0</div>
-             <div style={{ fontSize: '0.75rem', color: '#fca5a5', marginTop: '0.5rem' }}>Redis Cache: 99.9% Hit Rate</div>
+             <div style={{ fontSize: '2rem', fontWeight: 'bold', color: '#fff' }}>99.8%</div>
+             <div style={{ fontSize: '0.75rem', color: '#34d399', marginTop: '0.5rem' }}>Only 2 orphans required manual matching</div>
            </div>
         )}
       </div>
@@ -165,7 +165,14 @@ export default function AdminDashboard({ onBack }) {
                 <tr key={app.id} style={{ borderBottom: '1px solid #1e293b', background: i % 2 === 0 ? 'transparent' : 'rgba(255,255,255,0.01)' }}>
                   <td style={{ padding: '1rem 1.5rem', fontFamily: 'monospace', color: '#94a3b8' }}>{app.id}</td>
                   <td style={{ padding: '1rem 1.5rem', fontWeight: '500' }}>
-                    {app.name}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      {app.name}
+                      {app.fraudFlag && (
+                        <span style={{ background: '#ef4444', color: '#fff', fontSize: '0.625rem', padding: '2px 6px', borderRadius: '4px', display: 'flex', alignItems: 'center', gap: '0.25rem' }}>
+                          <ShieldAlert size={10} /> AI Flag: {app.fraudFlag}
+                        </span>
+                      )}
+                    </div>
                     <div style={{ fontSize: '0.75rem', color: '#64748b', marginTop: '0.25rem' }}>{app.type} Loan • {app.date}</div>
                   </td>
                   <td style={{ padding: '1rem 1.5rem' }}>{formatIndianCurrency(app.amount)}</td>
@@ -250,6 +257,38 @@ export default function AdminDashboard({ onBack }) {
                 </div>
               </div>
             </div>
+
+            {/* Predictive Analytics Panel */}
+            <div style={{ background: '#0f172a', border: '1px solid #1e293b', borderRadius: '12px', padding: '1.5rem' }}>
+               <h2 style={{ fontSize: '1.125rem', fontWeight: '600', margin: '0 0 1rem 0', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <Activity size={18} color="#f59e0b" />
+                Default Risk Prediction (ML Model)
+              </h2>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontSize: '0.875rem', color: '#e2e8f0' }}>Predicted NPA Rate (Q3)</div>
+                    <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginTop: '0.125rem' }}>Based on macro-economic indicators</div>
+                  </div>
+                  <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#10b981' }}>2.1%</div>
+                </div>
+                
+                <div>
+                  <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '0.5rem' }}>Risk Distribution by Cohort</div>
+                  <div style={{ display: 'flex', height: '12px', borderRadius: '6px', overflow: 'hidden' }}>
+                    <div style={{ width: '65%', background: '#10b981' }} title="Low Risk (65%)" />
+                    <div style={{ width: '25%', background: '#fbbf24' }} title="Medium Risk (25%)" />
+                    <div style={{ width: '10%', background: '#ef4444' }} title="High Risk (10%)" />
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.625rem', color: '#64748b', marginTop: '0.5rem' }}>
+                    <span>Low</span>
+                    <span>Med</span>
+                    <span>High</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
       </div>

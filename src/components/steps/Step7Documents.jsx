@@ -488,19 +488,29 @@ export default function Step7Documents({ onNext, onPrev }) {
             </div>
 
             {signatureData && (
-              <div style={{
-                marginTop: '0.5rem',
-                padding: '0.375rem',
-                borderRadius: '4px',
-                background: 'var(--color-surface-light)',
-                border: '1px solid var(--color-border)',
-                height: '40px',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                overflow: 'hidden',
-              }}>
-                <img src={signatureData} alt="Captured E-signature preview" style={{ height: '100%' }} />
+              <div style={{ marginTop: '0.75rem' }}>
+                <div style={{
+                  padding: '0.375rem',
+                  borderRadius: '4px',
+                  background: 'var(--color-surface-light)',
+                  border: '1px solid var(--color-border)',
+                  height: '40px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                  marginBottom: '0.5rem'
+                }}>
+                  <img src={signatureData} alt="Captured E-signature preview" style={{ height: '100%' }} />
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.625rem', background: 'rgba(251, 191, 36, 0.1)', color: '#fbbf24', padding: '0.125rem 0.375rem', borderRadius: '4px', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
+                    <ShieldCheck size={10} /> Govt E-Stamp Affixed
+                  </span>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', gap: '0.25rem', fontSize: '0.625rem', background: 'rgba(139, 92, 246, 0.1)', color: '#8b5cf6', padding: '0.125rem 0.375rem', borderRadius: '4px', border: '1px solid rgba(139, 92, 246, 0.2)' }}>
+                    <Lock size={10} /> Hash: {Math.random().toString(36).substring(2, 10).toUpperCase()}
+                  </span>
+                </div>
               </div>
             )}
 
