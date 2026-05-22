@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ArrowLeft, Users, CreditCard, ShieldAlert, BarChart3, ShieldCheck, Lock, Activity } from 'lucide-react';
+import { ArrowLeft, Users, CreditCard, ShieldAlert, BarChart3, ShieldCheck, Lock, Activity, Server } from 'lucide-react';
 import { formatIndianCurrency } from '../../utils/validators';
 
 const DUMMY_APPLICATIONS = [

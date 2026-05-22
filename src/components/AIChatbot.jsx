@@ -39,15 +39,27 @@ export default function AIChatbot() {
 
     // Simulate AI response delay
     setTimeout(() => {
-      let botResponse = "I'm a simulated AI assistant for this portfolio project! I can tell you that LendSwift uses advanced Open Banking APIs and Machine Learning to process applications instantly.";
+      let botResponse = "I'm a simulated AI assistant for this portfolio project! I can tell you that LendSwift uses advanced Open Banking APIs and Machine Learning to process applications instantly. How else can I help?";
       
       const lowerInput = userMsg.text.toLowerCase();
-      if (lowerInput.includes('emi') || lowerInput.includes('interest')) {
+      if (lowerInput.includes('emi') || lowerInput.includes('interest') || lowerInput.includes('rate')) {
         botResponse = "Interest rates start at 10.5% p.a. for Personal Loans. You can use the Loan Simulator panel on the right side of the application to see exact EMI breakdowns!";
-      } else if (lowerInput.includes('document') || lowerInput.includes('upload')) {
-        botResponse = "We use an AI-powered OCR system to extract data from your documents securely. Just upload a clear photo of your PAN or Aadhaar card.";
-      } else if (lowerInput.includes('fraud') || lowerInput.includes('security')) {
-        botResponse = "Security is our top priority. We use 256-bit encryption and a multi-layered AI fraud detection model that cross-references identity databases in real time.";
+      } else if (lowerInput.includes('document') || lowerInput.includes('upload') || lowerInput.includes('pan') || lowerInput.includes('aadhaar')) {
+        botResponse = "We use an AI-powered OCR system to extract data from your documents securely. Just upload a clear photo of your PAN or Aadhaar card in Step 6.";
+      } else if (lowerInput.includes('fraud') || lowerInput.includes('security') || lowerInput.includes('safe')) {
+        botResponse = "Security is our top priority. We use 256-bit encryption, Govt E-Stamps, and a multi-layered AI fraud detection model that cross-references identity databases in real time.";
+      } else if (lowerInput.includes('eligibility') || lowerInput.includes('qualify') || lowerInput.includes('eligible')) {
+        botResponse = "Eligibility depends on your monthly income, credit score, and existing liabilities. Our AI Underwriting engine calculates this in real-time during Step 8!";
+      } else if (lowerInput.includes('how long') || lowerInput.includes('time') || lowerInput.includes('fast') || lowerInput.includes('duration')) {
+        botResponse = "The entire application process takes less than 3 minutes, and disbursement happens instantly for pre-approved customers.";
+      } else if (lowerInput.includes('contact') || lowerInput.includes('support') || lowerInput.includes('help') || lowerInput.includes('call')) {
+        botResponse = "You can reach our human support team at support@lendswift.in or call 1800-XXX-XXXX during business hours.";
+      } else if (lowerInput.includes('hello') || lowerInput.includes('hi') || lowerInput.includes('hey')) {
+        botResponse = "Hello! How can I assist you with your LendSwift loan application today?";
+      } else if (lowerInput.includes('thank')) {
+        botResponse = "You're very welcome! Let me know if you need anything else.";
+      } else if (lowerInput.includes('payment') || lowerInput.includes('repay') || lowerInput.includes('upi')) {
+        botResponse = "You can make payments via UPI, Credit/Debit cards, or Net Banking from your Applicant Dashboard. We also support automated e-NACH mandates!";
       }
 
       setMessages(prev => [...prev, { text: botResponse, isBot: true }]);
